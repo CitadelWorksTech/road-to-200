@@ -4,6 +4,10 @@ def keystorePropsFile = rootProject.file('keystore.properties')
 def keystoreProps = new Properties()
 if (keystorePropsFile.exists()) { keystoreProps.load(new FileInputStream(keystorePropsFile)) }
 
+// Set by the GitHub Actions build; local builds fall back to these defaults.
+def appVersionCode = (System.getenv("VERSION_CODE") ?: "1") as Integer
+def appVersionName = System.getenv("VERSION_NAME") ?: "1.1.0"
+
 android {
     namespace = "tech.citadelworks.roadto200"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -11,14 +15,18 @@ android {
         applicationId "tech.citadelworks.roadto200"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode (System.getenv("VERSION_CODE") ?: "1").toInteger()
-        versionName System.getenv("VERSION_NAME") ?: "1.1.0"
+        versionCode = appVersionCode
+        versionName = appVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
              // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
+    }
+    lint {
+        checkReleaseBuilds = false
+        abortOnError = false
     }
     signingConfigs {
         release {

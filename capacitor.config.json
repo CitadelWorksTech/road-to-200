@@ -1,0 +1,8 @@
+{
+  "appId": "tech.citadelworks.roadto200",
+  "appName": "Road to 200",
+  "webDir": "www",
+  "android": {
+    "backgroundColor": "#F2F4F1"
+  }
+}

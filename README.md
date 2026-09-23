@@ -1,30 +1,25 @@
-# Road to 200 — phone app
+# Road to 200
 
-A weight and daily-routine tracker that installs on your phone's home screen and works offline.
-Your data is stored on the phone itself. Use **Plan settings → Export backup** every week or two.
+A weight, daily-routine, steps and disc golf tracker. One codebase, two ways to use it:
 
-## Files
-- `index.html` — the app
-- `manifest.webmanifest` — name, icon, and full-screen settings for installing
-- `sw.js` — offline support
-- `icons/` — home-screen icons
+| | How to get it | Steps |
+|---|---|---|
+| **Android app** (recommended) | Latest **Release** → `road-to-200.apk` | Counts steps all day with the phone's built-in sensor |
+| **Web app** | https://citadelworkstech.github.io/road-to-200/ → Chrome ⋮ → Install app | GPS walks and typed steps |
 
-## Put it online (GitHub Pages, free, about 5 minutes)
-1. Create a new public repository on GitHub, e.g. `road-to-200`.
-2. Upload everything in this folder (keep the `icons` folder).
-3. Repository **Settings → Pages** → Source: *Deploy from a branch* → Branch: `main`, folder `/ (root)` → Save.
-4. After a minute your app is at `https://<your-username>.github.io/road-to-200/`.
+All data stays on the phone. Use **Plan settings → Export backup** regularly.
 
-Any static host with HTTPS works the same way (Azure Static Web Apps, Netlify, Cloudflare Pages).
-HTTPS is required for installing and offline use.
+## Repository layout
+- `index.html`, `capacitor.js`, `manifest.webmanifest`, `sw.js`, `icons/`: the app. GitHub Pages serves these.
+- `android/`: the Android wrapper (Capacitor), including the step counter in
+  `android/app/src/main/java/tech/citadelworks/roadto200/`.
+- `.github/workflows/build-apk.yml`: builds a signed APK and publishes it as a Release on every change to the app.
 
-## Install on your phone
-- **iPhone (Safari):** open the link → Share button → **Add to Home Screen**.
-- **Android (Chrome):** open the link → ⋮ menu → **Install app** (or *Add to Home screen*).
+## Updating
+Edit `index.html`, commit, push. Pages updates the web app. Actions builds a new APK release.
+For the web app, also bump `CACHE` in `sw.js` (`road200-v6`, `v7`, …) so installed copies refresh.
 
-Open it from the home-screen icon from then on. Data saved in the installed app stays separate from data
-entered in a normal browser tab, so log from the icon.
-
-## Updating the app
-Replace `index.html` on the host. To force phones to refresh cached files, also change `CACHE = "road255-v1"`
-in `sw.js` to `v2`, `v3`, and so on. Your logged data is not affected by updates.
+## Signing key
+The APK signing key is **not** in this repo. It lives in two repository secrets:
+`KEYSTORE_BASE64` and `KEYSTORE_PASSWORD`. Keep a private copy of the keystore file. Every APK must be
+signed with the same key, or Android won't install updates over the old version.

@@ -1,0 +1,78 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "index.html"
+      - "capacitor.js"
+      - "icons/**"
+      - "android/**"
+      - "package.json"
+      - "package-lock.json"
+      - "capacitor.config.json"
+      - ".github/workflows/build-apk.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Install packages
+        run: npm ci
+
+      - name: Gather the web app (same files GitHub Pages serves)
+        run: |
+          mkdir -p www
+          cp -r index.html capacitor.js manifest.webmanifest icons www/
+
+      - name: Copy web app into the Android project
+        run: npx cap sync android
+
+      - name: Restore signing key from repository secrets
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ] || [ -z "$KEYSTORE_PASSWORD" ]; then
+            echo "::error::Add the KEYSTORE_BASE64 and KEYSTORE_PASSWORD secrets (Settings > Secrets and variables > Actions)."
+            exit 1
+          fi
+          echo "$KEYSTORE_BASE64" | base64 -d > android/road200.keystore
+          printf "storeFile=road200.keystore\nstorePassword=%s\nkeyAlias=road200\nkeyPassword=%s\n" "$KEYSTORE_PASSWORD" "$KEYSTORE_PASSWORD" > android/keystore.properties
+
+      - name: Build signed APK
+        working-directory: android
+        env:
+          VERSION_CODE: ${{ github.run_number }}
+          VERSION_NAME: 1.1.${{ github.run_number }}
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon
+          mv app/build/outputs/apk/release/app-release.apk ../road-to-200.apk
+
+      - name: Publish release with the APK
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: android-v1.1.${{ github.run_number }}
+          name: Road to 200 Android 1.1.${{ github.run_number }}
+          body: |
+            On your Android phone, tap road-to-200.apk below, then open the download to install.
+            Installing a newer build over an older one keeps all your data.
+          files: road-to-200.apk
+          make_latest: true

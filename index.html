@@ -141,6 +141,7 @@ summary{font-family:var(--cond);font-size:22px;font-weight:600;cursor:pointer}
 <body>
 <div class="wrap" id="app"></div>
 <script id="state" type="application/json">{"settings":{"startDate":"2026-09-23","startWeight":285,"goal":255,"checkpoint":270,"calories":2300,"protein":180,"weeks":24},"entries":{},"savedAt":0}</script>
+<script src="capacitor.js"></script>
 <script id="app-js">
 (function(){
 const DEF={settings:{startDate:"2026-09-23",startWeight:285,goal:255,checkpoint:270,calories:2300,protein:180,weeks:24,heightIn:72},entries:{},rounds:[],draft:null,walks:[],track:null,savedAt:0};
@@ -791,6 +792,7 @@ function stepsPanel(){
       </details>
       <div class="block">
         <h2>Phone steps</h2>
+        ${hcPanel()}
         <p style="margin:0 0 12px">${num(e.stepsAuto)!=null?`Today's phone total: <strong>${num(e.stepsAuto).toLocaleString()}</strong>${e.stepsAutoAt?`, updated ${new Date(e.stepsAutoAt).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})}`:""}.`:"No phone total for today yet."} When a phone total exists, it replaces the day's other step counts, since your phone already counted those steps.</p>
         <form id="phlog" autocomplete="off" style="border:0;padding:0;margin:0">
           <div class="fields">
@@ -799,12 +801,12 @@ function stepsPanel(){
           </div>
           <div class="backup"><button type="submit" class="quiet">Save phone total</button>${num(e.stepsAuto)!=null?`<button type="button" class="link" id="phclear">Clear today's phone total</button>`:""}</div>
         </form>
-        <details style="margin-top:12px;border-top:0;padding-top:0">
+        ${NATIVE?"":`        <details style="margin-top:12px;border-top:0;padding-top:0">
           <summary style="font-size:19px">Automatic import with Tasker</summary>
           <p class="foot">Any automation that opens this link with a step count imports it:</p>
           <p><code class="url">${esc(url)}?steps=8423</code> <button type="button" class="link" id="copyurl">Copy link</button></p>
           <p class="foot">Add <code>&amp;date=YYYY-MM-DD</code> to set a different day. Without it, the steps go to today.</p>
-        </details>
+        </details>`}
       </div>
     </section>
     <section>
@@ -845,8 +847,72 @@ function bindSteps(){
   if(pc)pc.addEventListener("click",()=>{const d=todayIso(),e=Object.assign({},state.entries[d]||{});delete e.stepsAuto;delete e.stepsAutoAt;commit(d,e);persist("Phone total cleared.")});
   const cu=document.getElementById("copyurl");
   if(cu)cu.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(location.origin+location.pathname+"?steps=%steps");cu.textContent="Copied"}catch(e){cu.textContent="Copy failed"}});
+  bindHc();
   document.querySelectorAll("[data-wdel]").forEach(b=>b.addEventListener("click",()=>{if(!confirm("Delete this walk?"))return;state.walks=state.walks.filter(w=>String(w.id)!==b.dataset.wdel);persist("Walk deleted.")}));
   updateLive();
+}
+
+// ---------- Android app (Capacitor): built-in step counter + native backup ----------
+const NATIVE=!!(window.Capacitor&&typeof window.Capacitor.isNativePlatform==="function"&&window.Capacitor.isNativePlatform());
+const plug=n=>(NATIVE&&typeof window.Capacitor.registerPlugin==="function")?window.Capacitor.registerPlugin(n):null;
+const SC=plug("StepCounter"),FS=plug("Filesystem"),SH=plug("Share");
+const sc={checked:false,available:false,granted:false,enabled:false,lastAt:0,enabledAt:0,busy:false,error:""};
+const errText=e=>String((e&&e.message)||e||"Unknown error");
+function applySteps(r){
+  sc.checked=true;sc.available=!!r.available;sc.granted=!!r.granted;sc.enabled=!!r.enabled;sc.lastAt=r.lastAt||0;sc.enabledAt=r.enabledAt||0;
+  let changed=false;const days=r.days||{};
+  for(const d of Object.keys(days)){
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(d))continue;
+    const v=Math.round(Number(days[d])||0),e=Object.assign({},state.entries[d]||{});
+    if(e.stepsAuto!==v){e.stepsAuto=v;e.stepsAutoAt=Date.now();state.entries[d]=e;changed=true}
+  }
+  if(changed){state.savedAt=Date.now();try{localStorage.setItem(LS,JSON.stringify(state))}catch(e){}}
+  return changed;
+}
+function quietRender(){const a=document.activeElement;if(a&&/INPUT|SELECT|TEXTAREA/.test(a.tagName))return;render()}
+async function scRefresh(){
+  if(!SC)return;
+  try{applySteps(await SC.getDays());sc.error=""}catch(e){sc.checked=true;sc.error=errText(e)}
+  quietRender();
+}
+async function scStart(){
+  if(!SC||sc.busy)return;sc.busy=true;render();
+  try{applySteps(await SC.start());sc.error="";sc.busy=false;persist("Step counting is on. Steps count from now on, all day.")}
+  catch(e){sc.busy=false;const m=errText(e);sc.error=/DENIED|allowed/i.test(m)?"Physical activity permission is needed to count steps. Tap App settings, then Permissions, then Physical activity, and choose Allow.":m;render()}
+}
+async function scStop(){
+  if(!SC)return;if(!confirm("Turn off step counting? Steps already counted are kept."))return;
+  try{applySteps(await SC.stop());persist("Step counting is off.")}catch(e){sc.error=errText(e);render()}
+}
+let scTimer=null;
+if(SC){
+  setTimeout(scRefresh,300);
+  document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")scRefresh()});
+  scTimer=setInterval(()=>{if(document.visibilityState==="visible"&&sc.enabled)scRefresh()},60000);
+}
+function hcPanel(){
+  if(!SC)return"";
+  let body;
+  if(!sc.checked)body=`<p class="foot">Checking the step counter…</p>`;
+  else if(!sc.available)body=`<p>This phone doesn't have a step counter sensor. Use GPS walks or type your steps instead.</p>`;
+  else if(!sc.enabled||!sc.granted)body=`<p>Count steps all day with your phone's built-in step sensor. No other apps needed. Android will ask to allow <strong>Physical activity</strong>.</p><div class="backup"><button type="button" id="scstart" ${sc.busy?"disabled":""}>${sc.busy?"Starting…":"Turn on step counting"}</button>${sc.error?`<button type="button" class="link" id="scsettings">App settings</button>`:""}</div>`;
+  else{
+    const last=sc.lastAt?new Date(sc.lastAt).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"}):"waiting for your first steps";
+    const firstDay=sc.enabledAt&&localKey(new Date(sc.enabledAt))===todayIso();
+    body=`<p>On. Your phone counts steps all day, even when this app is closed. A small notification shows today's count. Last update: <strong>${esc(last)}</strong>.</p>${firstDay?`<p class="foot">Today started counting when you turned it on, so today's total is partial.</p>`:""}<div class="backup"><button type="button" class="quiet" id="screfresh">Refresh</button><button type="button" class="link" id="scstop">Turn off</button><button type="button" class="link" id="scsettings">App settings</button></div><p class="foot">If counts stop overnight, set Battery for this app to Unrestricted in App settings.</p>`;
+  }
+  return`<div class="daily" style="margin-bottom:18px"><p><strong>Built-in step counter</strong></p>${body}${sc.error?`<p class="foot" style="color:var(--amber)">${esc(sc.error)}</p>`:""}</div>`;
+}
+function localKey(dt){return dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0")+"-"+String(dt.getDate()).padStart(2,"0")}
+function bindHc(){
+  const on=(id,f)=>{const el=document.getElementById(id);if(el)el.addEventListener("click",f)};
+  on("scstart",scStart);on("scstop",scStop);on("screfresh",scRefresh);
+  on("scsettings",async()=>{try{await SC.openSettings()}catch(e){sc.error=errText(e);render()}});
+}
+async function nativeExport(){
+  const name=backupName(),data=JSON.stringify(state,null,2);
+  const w=await FS.writeFile({path:name,data,directory:"CACHE",encoding:"utf8"});
+  await SH.share({title:"Road to 200 backup",files:[w.uri],dialogTitle:"Save or send your backup"});
 }
 
 // ---------- saving ----------
@@ -858,6 +924,7 @@ function persist(msg){
 }
 function backupName(){return "road-to-200-backup-"+todayIso()+".json"}
 async function exportData(){
+  if(NATIVE&&FS&&SH){try{await nativeExport()}catch(e){if(!/cancel/i.test(errText(e)))alert("Couldn't export the backup: "+errText(e))}return}
   const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
   const file=new File([blob],backupName(),{type:"application/json"});
   try{
@@ -880,7 +947,7 @@ function importData(file){
   };
   r.readAsText(file);
 }
-if("serviceWorker" in navigator&&location.protocol!=="file:"){
+if(!NATIVE&&"serviceWorker" in navigator&&location.protocol!=="file:"){
   window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
 }
 try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}

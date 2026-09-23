@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build Android app
 
 on:
   push:
@@ -63,8 +63,9 @@ jobs:
           VERSION_NAME: 1.1.${{ github.run_number }}
         run: |
           chmod +x gradlew
-          ./gradlew assembleRelease --no-daemon
+          ./gradlew assembleRelease bundleRelease --no-daemon
           mv app/build/outputs/apk/release/app-release.apk ../road-to-200.apk
+          mv app/build/outputs/bundle/release/app-release.aab ../road-to-200.aab
 
       - name: Publish release with the APK
         uses: softprops/action-gh-release@v2
@@ -72,7 +73,10 @@ jobs:
           tag_name: android-v1.1.${{ github.run_number }}
           name: Road to 200 Android 1.1.${{ github.run_number }}
           body: |
-            On your Android phone, tap road-to-200.apk below, then open the download to install.
+            road-to-200.aab: upload this to Google Play Console (internal testing).
+            road-to-200.apk: direct install on a phone without the Play Store.
             Installing a newer build over an older one keeps all your data.
-          files: road-to-200.apk
+          files: |
+            road-to-200.aab
+            road-to-200.apk
           make_latest: true

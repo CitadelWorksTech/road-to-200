@@ -49,10 +49,34 @@ h3{font-size:20px;font-weight:600;margin:18px 0 6px}
 .tabs button{background:none;color:var(--muted);border:0;border-bottom:4px solid transparent;border-radius:0;margin-bottom:-2px;padding:10px 18px 8px;font-family:var(--cond);font-size:24px;font-weight:600}
 .tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--route)}
 .tabs button:hover{color:var(--ink)}
+.scorecard{border-top:2px solid var(--ink);margin-top:10px}
+.hole{display:grid;grid-template-columns:2.4em 1fr 1fr 2.6em;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)}
+.hole.head{font-size:13px;color:var(--muted);font-weight:600;padding:6px 0 4px}
+.hole .hn{font-family:var(--cond);font-size:22px;font-weight:700;color:var(--muted)}
+.hole.played .hn{color:var(--ink)}
+.stepper{display:inline-flex;align-items:center;gap:4px}
+.stepper button{width:44px;height:44px;min-height:0;padding:0;font-size:22px;line-height:1;background:transparent;color:var(--ink);border:1px solid var(--line)}
+.stepper b{min-width:1.8em;text-align:center;font-family:var(--cond);font-size:24px;font-weight:600}
+.hd{font-family:var(--cond);font-size:20px;font-weight:700;text-align:right}
+.hd.down{color:var(--sage)}.hd.up{color:var(--amber)}
+@media (max-width:440px){.stepper button{width:38px;height:40px;font-size:20px}.stepper b{min-width:1.4em;font-size:21px}.hole{gap:4px;grid-template-columns:1.8em 1fr 1fr 2.2em}.hd{font-size:18px}}
+.tabs{overflow-x:auto;scrollbar-width:none}
+.tabs button{white-space:nowrap;flex:0 0 auto}
+@media (max-width:520px){.tabs button{font-size:19px;padding:10px 8px 8px}}
+@media (max-width:400px){.tabs button{font-size:17px;padding:10px 6px 8px}}
+.live-banner{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:12px 0 0;padding:8px 14px;background:var(--route-soft);border-left:4px solid var(--route);font-size:15px}
+.route svg{display:block;width:100%;height:auto;border-radius:8px}
+.thumb svg{display:block;width:64px;height:40px}
+.places{display:grid;gap:12px}
+.ptop{display:flex;justify-content:space-between;gap:12px;font-weight:600}
+.ptop small{color:var(--muted);font-weight:500;margin-left:6px}
+.pbar{height:10px;background:var(--line);border-radius:5px;overflow:hidden;margin-top:4px}
+.pbar i{display:block;height:100%;background:var(--route);border-radius:5px}
+code.url{font-size:14px;word-break:break-all;background:var(--field);border:1px solid var(--line);padding:2px 6px;border-radius:4px}
 .status{font-size:19px;max-width:64ch;margin:10px 0 0}
 .status strong{font-weight:600}
 .chart{margin:22px 0 8px;width:100%;overflow-x:auto}
-.chart svg{display:block;width:100%;min-width:560px;height:auto}
+.chart svg{display:block;width:100%;height:auto}
 .legend{display:flex;flex-wrap:wrap;gap:6px 20px;color:var(--muted);font-size:14px}
 .legend i{display:inline-block;width:18px;height:0;border-top:3px solid var(--route);vertical-align:middle;margin-right:6px}
 .legend i.pace{border-top:2px dashed var(--muted)}
@@ -96,7 +120,7 @@ td.up{color:var(--amber);font-weight:600}
 .history{margin-top:44px}
 .block{margin-top:44px}
 .pushchart{overflow-x:auto;margin:4px 0 6px}
-.pushchart svg{display:block;width:100%;min-width:480px;height:auto}
+.pushchart svg{display:block;width:100%;height:auto}
 .pushstats{display:flex;flex-wrap:wrap;gap:4px 22px;color:var(--muted);font-size:15px;margin:0}
 .pushstats b{color:var(--ink);font-weight:600}
 .sum{font-size:14px;color:var(--muted);min-height:1.4em}
@@ -119,7 +143,7 @@ summary{font-family:var(--cond);font-size:22px;font-weight:600;cursor:pointer}
 <script id="state" type="application/json">{"settings":{"startDate":"2026-09-23","startWeight":285,"goal":255,"checkpoint":270,"calories":2300,"protein":180,"weeks":24},"entries":{},"savedAt":0}</script>
 <script id="app-js">
 (function(){
-const DEF={settings:{startDate:"2026-09-23",startWeight:285,goal:255,checkpoint:270,calories:2300,protein:180,weeks:24},entries:{},savedAt:0};
+const DEF={settings:{startDate:"2026-09-23",startWeight:285,goal:255,checkpoint:270,calories:2300,protein:180,weeks:24,heightIn:72},entries:{},rounds:[],draft:null,walks:[],track:null,savedAt:0};
 const LS="road255-state";
 // Standalone app build: data is stored on this device in localStorage.
 const HEAD='<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n<title>Road to 200</title>\n<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">\n';
@@ -128,7 +152,7 @@ const STR_B=["Reverse lunges, 8 per leg","Table or doorframe rows, 10–12","Ste
 
 function norm(s){
   s=s&&typeof s==="object"?s:{};
-  return {settings:Object.assign({},DEF.settings,s.settings||{}),entries:Object.assign({},s.entries||{}),savedAt:s.savedAt||0};
+  return {settings:Object.assign({},DEF.settings,s.settings||{}),entries:Object.assign({},s.entries||{}),rounds:Array.isArray(s.rounds)?s.rounds:[],draft:s.draft&&Array.isArray(s.draft.holes)?s.draft:null,walks:Array.isArray(s.walks)?s.walks:[],track:s.track&&Array.isArray(s.track.route)?s.track:null,savedAt:s.savedAt||0};
 }
 function load(){
   let s=null;
@@ -179,19 +203,20 @@ function num(v){const n=parseFloat(v);return isFinite(n)?n:null}
 function rolling(ws,n){const a=ws.filter(x=>x.n<=n&&x.n>n-7).map(x=>x.w);return avg(a)}
 function weekly(){
   const by={};
-  for(const d of sortedDates()){const w=weekOf(d);(by[w]=by[w]||[]).push(Object.assign({_hit:pushHit(d)},state.entries[d]))}
+  for(const d of [...new Set([...sortedDates(),...state.walks.map(x=>x.date)])].sort()){const w=weekOf(d);(by[w]=by[w]||[]).push(Object.assign({_hit:pushHit(d),_steps:dayStepsTotal(d)},state.entries[d]||{}))}
   return Object.keys(by).map(Number).sort((a,b)=>a-b).map(w=>{
     const es=by[w];const pick=k=>avg(es.map(e=>num(e[k])).filter(v=>v!=null));
-    return{w,weight:pick("weight"),cal:pick("calories"),pro:pick("protein"),steps:pick("steps"),push:pick("pushups"),waist:(es.map(e=>num(e.waist)).filter(v=>v!=null).pop()??null),weighins:es.filter(e=>num(e.weight)!=null).length,pushHits:es.filter(e=>e._hit).length,pushDays:es.filter(e=>pushTotal(e)!=null).length,sessions:es.filter(e=>e.session).length,days:es.length};
+    return{w,weight:pick("weight"),cal:pick("calories"),pro:pick("protein"),steps:pick("_steps"),push:pick("pushups"),waist:(es.map(e=>num(e.waist)).filter(v=>v!=null).pop()??null),weighins:es.filter(e=>num(e.weight)!=null).length,pushHits:es.filter(e=>e._hit).length,pushDays:es.filter(e=>pushTotal(e)!=null).length,sessions:es.filter(e=>e.session).length,days:es.length};
   });
 }
 
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 
 // ---------- chart ----------
+function cw(){const w=(document.documentElement.clientWidth||800)-40;return Math.round(Math.min(800,Math.max(340,w)))}
 function chart(){
   const S=state.settings,ws=weights();
-  const W=800,H=330,L=46,R=64,T=16,B=32;
+  const W=cw(),H=W<600?300:330,L=40,R=W<600?40:78,T=16,B=32;
   const s0=dn(S.startDate),span=Math.max(S.weeks*7,(ws.length?ws[ws.length-1].n-s0+7:0));
   const lo=Math.floor(Math.min(S.goal-4,...ws.map(x=>x.w))/5)*5,hi=Math.ceil(Math.max(S.startWeight+3,...ws.map(x=>x.w))/5)*5;
   const X=n=>L+(n-s0)/span*(W-L-R),Y=v=>T+(hi-v)/(hi-lo)*(H-T-B);
@@ -199,8 +224,8 @@ function chart(){
   for(let v=lo;v<=hi;v+=5){g+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)" stroke-width="1"/><text x="${L-8}" y="${Y(v)+4}" text-anchor="end" font-size="12" fill="var(--muted)">${v}</text>`}
   for(let wk=0;wk*7<=span;wk+=4){const x=X(s0+wk*7);g+=`<text x="${x}" y="${H-10}" text-anchor="middle" font-size="12" fill="var(--muted)">Wk ${wk+1}</text>`}
   const mile=(v,col,label)=>`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="${col}" stroke-width="2"/><text x="${W-R+6}" y="${Y(v)+4}" font-size="13" font-weight="600" fill="${col}">${label}</text>`;
-  g+=mile(S.checkpoint,"var(--amber)",S.checkpoint+" check");
-  g+=mile(S.goal,"var(--sage)",S.goal+" goal");
+  g+=mile(S.checkpoint,"var(--amber)",W<600?""+S.checkpoint:S.checkpoint+" check");
+  g+=mile(S.goal,"var(--sage)",W<600?""+S.goal:S.goal+" goal");
   g+=`<line x1="${X(s0)}" y1="${Y(S.startWeight)}" x2="${X(s0+S.weeks*7)}" y2="${Y(S.goal)}" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="6 5"/>`;
   g+=ws.map(p=>`<circle cx="${X(p.n)}" cy="${Y(p.w)}" r="3" fill="var(--muted)" opacity=".55"><title>${p.d}: ${p.w} lb</title></circle>`).join("");
   if(ws.length){
@@ -216,7 +241,7 @@ function chart(){
 
 function pushChart(){
   const t=dn(todayIso()),s0=dn(state.settings.startDate),end=Math.max(t,s0+13),days=42,from=Math.max(s0,end-days+1),n=end-from+1;
-  const W=800,H=190,L=36,R=12,T=12,B=28,bw=(W-L-R)/n;
+  const W=cw(),H=190,L=36,R=12,T=12,B=28,bw=(W-L-R)/n;
   let mx=0;for(let i=0;i<n;i++){const d=iso(from+i);mx=Math.max(mx,pushTarget(weekOf(d)),pushTotal(state.entries[d])||0)}
   mx=Math.ceil((mx+5)/10)*10;const Y=v=>T+(mx-v)/mx*(H-T-B);
   let g="";
@@ -271,6 +296,7 @@ function notes(){
 const WKEYS=["weight","waist","wnote"];
 const RKEYS=["calories","protein","steps","pushups","pushSets","surface","session","water","sleep","note"];
 let tab="weight";try{tab=sessionStorage.getItem("road255-tab")||localStorage.getItem("road255-tab")||"weight"}catch(e){}
+if(!["weight","routine","steps","golf"].includes(tab))tab="weight";
 let wDate=todayIso(),rDate=todayIso();
 function setTab(t){tab=t;try{sessionStorage.setItem("road255-tab",t);localStorage.setItem("road255-tab",t)}catch(e){}render()}
 function has(e,keys){return e&&keys.some(k=>e[k]!=null&&e[k]!==""&&!(Array.isArray(e[k])&&!e[k].length))}
@@ -283,9 +309,12 @@ function render(){
   <div class="top"><h1>Road to 200</h1><div class="where">${where}</div></div>
   <div class="tabs" role="tablist" aria-label="Tracker areas">
     <button role="tab" id="tab-weight" aria-selected="${tab==="weight"}" aria-controls="panel" data-tab="weight">Weight</button>
-    <button role="tab" id="tab-routine" aria-selected="${tab==="routine"}" aria-controls="panel" data-tab="routine">Daily routine</button>
+    <button role="tab" id="tab-routine" aria-selected="${tab==="routine"}" aria-controls="panel" data-tab="routine">Routine</button>
+    <button role="tab" id="tab-steps" aria-selected="${tab==="steps"}" aria-controls="panel" data-tab="steps">Steps</button>
+    <button role="tab" id="tab-golf" aria-selected="${tab==="golf"}" aria-controls="panel" data-tab="golf">Disc golf</button>
   </div>
-  <div id="panel" role="tabpanel" aria-labelledby="tab-${tab}">${tab==="weight"?weightPanel():routinePanel()}</div>
+  ${state.track&&tab!=="steps"?`<div class="live-banner"><span>Walk ${state.track.paused?"paused":"tracking"}: <b id="banner-live"></b></span><button type="button" class="link" data-tab="steps">Open</button></div>`:""}
+  <div id="panel" role="tabpanel" aria-labelledby="tab-${tab}">${tab==="weight"?weightPanel():tab==="golf"?golfPanel():tab==="steps"?stepsPanel():routinePanel()}</div>
   <details>
     <summary>Plan settings</summary>
     <form id="settings" style="border:0;padding:0;margin:0">
@@ -297,6 +326,7 @@ function render(){
         <label>Calories/day<input type="number" name="calories" value="${S.calories}"></label>
         <label>Protein (g)<input type="number" name="protein" value="${S.protein}"></label>
         <label>Plan length (weeks)<input type="number" name="weeks" value="${S.weeks}"></label>
+        <label>Height (in)<input type="number" name="heightIn" value="${S.heightIn}"></label>
       </div>
       <button type="submit" class="quiet" ${readOnly?"disabled":""}>Save settings</button>
       <p class="foot">Strength days alternate A and B each week. The steps target starts at 5,500 and rises by 1,000 every two weeks to 10,000. Daily push-ups start at 20 and rise by 10 every two weeks to 60. At 60, move from counter to chair to floor.</p>
@@ -375,7 +405,7 @@ function routinePanel(){
           <label class="wide">Date<input type="date" name="date" value="${rDate}" max="${t}"></label>
           <label>Calories<input type="number" inputmode="numeric" name="calories" value="${esc(e.calories)}"></label>
           <label>Protein (g)<input type="number" inputmode="numeric" name="protein" value="${esc(e.protein)}"></label>
-          <label>Steps<input type="number" inputmode="numeric" name="steps" value="${esc(e.steps)}"></label>
+          <label>Steps (typed)<input type="number" inputmode="numeric" name="steps" value="${esc(e.steps)}"></label>
           <label>Push-up sets<input type="text" inputmode="numeric" name="pushsets" placeholder="6, 5, 5, 4" value="${esc((e.pushSets||[]).join(", "))}"></label>
           <label>Push-ups total<input type="number" inputmode="numeric" name="pushups" value="${esc(pushTotal(e))}" ${(e.pushSets||[]).length?"readonly":""}></label>
           <label>Push-up surface<select name="surface"><option value="">Not set</option>${Object.entries(SURF).map(([k,v])=>`<option value="${k}" ${e.surface===k?"selected":""}>${v}</option>`).join("")}</select></label>
@@ -397,15 +427,15 @@ function routinePanel(){
       <div class="block">
         <h2>Weekly routine</h2>
         ${wk.length?`<div class="tablewrap"><table>
-          <thead><tr><th>Week</th><th>Calories</th><th>Protein</th><th>Steps</th><th>Push-ups/day</th><th>Sessions</th></tr></thead>
-          <tbody>${wk.map(r=>`<tr><td>${r.w}</td><td>${r.cal!=null?Math.round(r.cal).toLocaleString():"–"}</td><td>${r.pro!=null?Math.round(r.pro):"–"}</td><td>${r.steps!=null?Math.round(r.steps).toLocaleString():"–"}</td><td>${r.push!=null?Math.round(r.push)+" ("+r.pushHits+"/"+r.pushDays+" hit)":"–"}</td><td>${r.sessions}</td></tr>`).join("")}</tbody>
+          <thead><tr><th>Week</th><th>Calories</th><th>Protein</th><th>Steps</th><th>Push-ups/day</th><th>Sessions</th><th>Disc golf</th></tr></thead>
+          <tbody>${wk.map(r=>`<tr><td>${r.w}</td><td>${r.cal!=null?Math.round(r.cal).toLocaleString():"–"}</td><td>${r.pro!=null?Math.round(r.pro):"–"}</td><td>${r.steps!=null?Math.round(r.steps).toLocaleString():"–"}</td><td>${r.push!=null?Math.round(r.push)+" ("+r.pushHits+"/"+r.pushDays+" hit)":"–"}</td><td>${r.sessions}</td><td>${roundsInWeek(r.w)||"–"}</td></tr>`).join("")}</tbody>
         </table></div><p class="foot">Averages cover the days you logged.</p>`:`<p class="empty">Your weeks show up here once you log a few days.</p>`}
       </div>
       <div class="history">
         <h2>Recent days</h2>
         ${hist.length?`<div class="tablewrap"><table>
           <thead><tr><th>Day</th><th>Cal</th><th>Protein</th><th>Steps</th><th>Push-ups</th><th>Surface</th><th>Session</th><th>Water</th><th>Sleep</th><th></th><th>Note</th></tr></thead>
-          <tbody>${hist.map(d=>{const x=state.entries[d],pt=pushTotal(x);return`<tr><td><button class="link" data-edit="${d}">${fmtDate(d)}</button></td><td>${dash(x.calories)}</td><td>${dash(x.protein)}</td><td>${x.steps?Number(x.steps).toLocaleString():"–"}</td><td title="${esc((x.pushSets||[]).join(", "))}">${pt!=null?pt+(pushHit(d)?" ✓":""):"–"}</td><td>${x.surface?SURF[x.surface]:"–"}</td><td>${yes(x.session)}</td><td>${yes(x.water)}</td><td>${yes(x.sleep)}</td><td>${readOnly?"":`<button class="link" data-del="${d}" aria-label="Delete routine for ${fmtDate(d)}">Delete</button>`}</td><td>${esc(x.note)}</td></tr>`}).join("")}</tbody>
+          <tbody>${hist.map(d=>{const x=state.entries[d],pt=pushTotal(x);return`<tr><td><button class="link" data-edit="${d}">${fmtDate(d)}</button></td><td>${dash(x.calories)}</td><td>${dash(x.protein)}</td><td>${dayStepsTotal(d)!=null?dayStepsTotal(d).toLocaleString():"–"}</td><td title="${esc((x.pushSets||[]).join(", "))}">${pt!=null?pt+(pushHit(d)?" ✓":""):"–"}</td><td>${x.surface?SURF[x.surface]:"–"}</td><td>${yes(x.session)}</td><td>${yes(x.water)}</td><td>${yes(x.sleep)}</td><td>${readOnly?"":`<button class="link" data-del="${d}" aria-label="Delete routine for ${fmtDate(d)}">Delete</button>`}</td><td>${esc(x.note)}</td></tr>`}).join("")}</tbody>
         </table></div>`:`<p class="empty">No days logged yet.</p>`}
       </div>
     </section>
@@ -416,10 +446,12 @@ function clearKeys(d,keys){const e=Object.assign({},state.entries[d]||{});keys.f
 function commit(d,e){if(Object.keys(e).length)state.entries[d]=e;else delete state.entries[d]}
 
 function bind(){
+  if(state.track)setTimeout(updateLive,0);
   document.querySelectorAll("[data-tab]").forEach(b=>{
     b.addEventListener("click",()=>setTab(b.dataset.tab));
-    b.addEventListener("keydown",ev=>{if(ev.key==="ArrowRight"||ev.key==="ArrowLeft"){setTab(tab==="weight"?"routine":"weight");document.getElementById("tab-"+tab).focus()}});
+    b.addEventListener("keydown",ev=>{if(ev.key==="ArrowRight"||ev.key==="ArrowLeft"){{const o=["weight","routine","steps","golf"],i=o.indexOf(tab);setTab(o[(i+(ev.key==="ArrowRight"?1:3))%4])};document.getElementById("tab-"+tab).focus()}});
   });
+  if(tab==="golf")bindGolf();else if(tab==="steps")bindSteps();else{
   const isW=tab==="weight",keys=isW?WKEYS:RKEYS;
   const f=document.getElementById(isW?"wlog":"rlog"),F=n=>f.elements[n];
   F("date").addEventListener("change",()=>{const v=F("date").value;if(v){if(isW)wDate=v;else rDate=v;render()}});
@@ -452,6 +484,7 @@ function bind(){
     const d=b.dataset.del;if(!confirm("Delete the "+(isW?"weigh-in":"routine log")+" for "+fmtDate(d)+"?"))return;
     commit(d,clearKeys(d,keys));persist("Deleted "+fmtDate(d)+".");
   }));
+  }
   document.getElementById("export").addEventListener("click",exportData);
   document.getElementById("import").addEventListener("change",ev=>{const fl=ev.target.files&&ev.target.files[0];if(fl)importData(fl);ev.target.value=""});
   const s=document.getElementById("settings");
@@ -459,11 +492,362 @@ function bind(){
     ev.preventDefault();
     const n={...state.settings};
     if(s.elements.startDate.value)n.startDate=s.elements.startDate.value;
-    ["startWeight","checkpoint","goal","calories","protein","weeks"].forEach(k=>{const v=num(s.elements[k].value);if(v!=null&&v>0)n[k]=v});
+    ["startWeight","checkpoint","goal","calories","protein","weeks","heightIn"].forEach(k=>{const v=num(s.elements[k].value);if(v!=null&&v>0)n[k]=v});
     state.settings=n;persist("Settings saved.");
   });
 }
 function say(t){const m=document.getElementById("msg");if(m)m.textContent=t}
+
+// ---------- disc golf ----------
+function vsPar(n){return n==null?"–":n===0?"E":(n>0?"+"+n:""+n)}
+function roundPar(r){return r.holesData&&r.holesData.length?r.holesData.reduce((a,h)=>a+h.par,0):num(r.par)}
+function roundScore(r){return r.holesData&&r.holesData.length?r.holesData.reduce((a,h)=>a+h.s,0):num(r.score)}
+function roundHoles(r){return r.holesData&&r.holesData.length?r.holesData.length:num(r.holes)}
+function roundDiff(r){const p=roundPar(r),s=roundScore(r);return p!=null&&s!=null?s-p:null}
+function courses(){return [...new Set(state.rounds.map(r=>r.course).filter(Boolean))].sort()}
+function roundsInWeek(w){return state.rounds.filter(r=>weekOf(r.date)===w).length}
+function golfStreak(){let w=weekOf(todayIso());if(!roundsInWeek(w))w--;let c=0;while(c<520&&roundsInWeek(w)){c++;w--}return c}
+function saveQuiet(){state.savedAt=Date.now();try{localStorage.setItem(LS,JSON.stringify(state))}catch(e){}render()}
+function lastPars(course,n){const r=state.rounds.filter(x=>x.course===course&&x.holesData&&x.holesData.length===n).sort((a,b)=>b.date.localeCompare(a.date))[0];return r?r.holesData.map(h=>h.par):null}
+
+function golfChart(rs){
+  const list=rs.filter(r=>roundDiff(r)!=null).slice(0,20).reverse();
+  if(list.length<2)return"";
+  const W=cw(),H=180,L=36,R=12,T=14,B=26,bw=(W-L-R)/list.length;
+  const ds=list.map(roundDiff),mx=Math.max(3,...ds.map(Math.abs));const lim=Math.ceil(mx/3)*3;
+  const Y=v=>T+(lim-v)/(2*lim)*(H-T-B);
+  let g=`<line x1="${L}" x2="${W-R}" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--ink)" stroke-width="1.5"/>`;
+  for(const v of[-lim,0,lim])g+=`<text x="${L-6}" y="${Y(v)+4}" text-anchor="end" font-size="12" fill="var(--muted)">${vsPar(v)}</text>`;
+  list.forEach((r,i)=>{const d=ds[i],x=L+i*bw+bw*.15,y=Math.min(Y(0),Y(d)),h=Math.max(2,Math.abs(Y(d)-Y(0)));
+    g+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${(bw*.7).toFixed(1)}" height="${h.toFixed(1)}" rx="2" fill="${d<=0?"var(--sage)":"var(--amber)"}"><title>${r.date} ${esc(r.course||"")}: ${vsPar(d)}</title></rect>`});
+  g+=`<text x="${L}" y="${H-8}" font-size="11" fill="var(--muted)">Older</text><text x="${W-R}" y="${H-8}" text-anchor="end" font-size="11" fill="var(--muted)">Latest</text>`;
+  return`<div class="pushchart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Score versus par, last ${list.length} rounds" font-family="Barlow, system-ui, sans-serif">${g}</svg></div>`;
+}
+
+function golfPanel(){
+  const t=todayIso(),w=weekOf(t),d=state.draft;
+  const rs=state.rounds.slice().sort((a,b)=>b.date.localeCompare(a.date)||(b.id||0)-(a.id||0));
+  const diffs=rs.map(roundDiff).filter(v=>v!=null);
+  const last5=avg(diffs.slice(0,5));
+  const cl=`<datalist id="courselist">${courses().map(c=>`<option value="${esc(c)}">`).join("")}</datalist>`;
+  let card;
+  if(d){
+    const played=d.holes.filter(h=>h.s>0),strokes=played.reduce((a,h)=>a+h.s,0),diff=played.reduce((a,h)=>a+h.s-h.par,0);
+    card=`<h2>${esc(d.course||"Round in progress")}</h2>
+    <p class="status" style="margin-top:0">${played.length?`Thru ${played.length} of ${d.holes.length}: <strong>${vsPar(diff)}</strong>, ${strokes} throws.`:`${d.holes.length} holes. Tap + on throws to record each hole.`}</p>
+    <div class="scorecard">
+      <div class="hole head"><span>#</span><span>Par</span><span>Throws</span><span></span></div>
+      ${d.holes.map((h,i)=>`<div class="hole${h.s?" played":""}">
+        <span class="hn">${i+1}</span>
+        <span class="stepper"><button type="button" data-h="${i}" data-f="par" data-d="-1" aria-label="Hole ${i+1} par down">−</button><b>${h.par}</b><button type="button" data-h="${i}" data-f="par" data-d="1" aria-label="Hole ${i+1} par up">+</button></span>
+        <span class="stepper"><button type="button" data-h="${i}" data-f="s" data-d="-1" aria-label="Hole ${i+1} throws down">−</button><b>${h.s||"–"}</b><button type="button" data-h="${i}" data-f="s" data-d="1" aria-label="Hole ${i+1} throws up">+</button></span>
+        <span class="hd ${h.s?(h.s-h.par<0?"down":h.s-h.par>0?"up":""):""}">${h.s?vsPar(h.s-h.par):""}</span>
+      </div>`).join("")}
+    </div>
+    <p class="foot">The first tap on + sets throws to par. Pars are remembered for next time you play this course.</p>
+    <div class="backup"><button type="button" id="finish">Finish round</button><button type="button" class="quiet" id="discard">Discard</button>${state.track?"":`<button type="button" class="link" id="golfgps">Track this round's walk with GPS</button>`}</div>`;
+  }else{
+    card=`<h2>Start a round</h2>
+    <form id="gstart" autocomplete="off" style="margin:0;border:0;padding:0">
+      <div class="fields">
+        <label class="wide">Course<input type="text" name="course" list="courselist" maxlength="60" placeholder="Course name" value="${esc(courses()[0]||"")}"></label>
+        <label>Holes<select name="holes"><option>18</option><option>9</option><option>24</option><option>27</option></select></label>
+        <label>Default par<input type="number" name="par" value="3" min="2" max="6"></label>
+      </div>
+      <p class="foot">Keeps score hole by hole on your phone. Walk the course instead of riding.</p>
+      <button type="submit">Start round</button><span class="saved" id="msg" role="status"></span>
+    </form>`;
+  }
+  const byCourse={};
+  rs.forEach(r=>{const k=(r.course||"Unnamed")+"|"+roundHoles(r);(byCourse[k]=byCourse[k]||[]).push(r)});
+  const cRows=Object.entries(byCourse).map(([k,list])=>{const[c,h]=k.split("|");const ds=list.map(roundDiff).filter(v=>v!=null);return{c,h,n:list.length,best:ds.length?Math.min(...ds):null,avg:ds.length?avg(ds):null}}).sort((a,b)=>b.n-a.n);
+  return`
+  <p class="status">${rs.length?`<strong>${roundsInWeek(w)}</strong> round${roundsInWeek(w)===1?"":"s"} this week. ${golfStreak()?`Played ${golfStreak()} week${golfStreak()>1?"s":""} in a row.`:"Play one this week to start a streak."}`:"Your weekly round counts as cardio. Log it here."}</p>
+  <p class="pushstats" style="margin-top:8px"><span>Rounds <b>${rs.length}</b></span><span>Best <b>${diffs.length?vsPar(Math.min(...diffs)):"–"}</b></span><span>Last 5 avg <b>${last5!=null?vsPar(Math.round(last5*10)/10):"–"}</b></span><span>Time played <b>${Math.round(rs.reduce((a,r)=>a+(num(r.minutes)||0),0)/6)/10} hr</b></span></p>
+  ${cl}
+  <div class="grid" style="margin-top:28px">
+    <section class="plan">
+      ${card}
+      <details style="margin-top:28px">
+        <summary>Log a finished round</summary>
+        <form id="glog" autocomplete="off" style="border:0;padding:0;margin-top:14px">
+          <div class="fields">
+            <label>Date<input type="date" name="date" value="${t}" max="${t}"></label>
+            <label>Course<input type="text" name="course" list="courselist" maxlength="60"></label>
+            <label>Holes<input type="number" name="holes" value="18" min="1" max="36"></label>
+            <label>Par<input type="number" name="par" value="54"></label>
+            <label>Throws<input type="number" name="score" inputmode="numeric"></label>
+            <label>Minutes<input type="number" name="minutes" inputmode="numeric"></label>
+            <label class="wide">Note<input type="text" name="note" maxlength="120"></label>
+          </div>
+          <button type="submit" class="quiet" style="margin-top:12px">Save round</button>
+        </form>
+      </details>
+    </section>
+    <section>
+      <h2>Score vs par</h2>
+      ${golfChart(rs)||`<p class="empty">Play two rounds to see a trend. Green is at or under par, amber is over.</p>`}
+      <div class="block">
+        <h2>Courses</h2>
+        ${cRows.length?`<div class="tablewrap"><table><thead><tr><th>Course</th><th>Holes</th><th>Rounds</th><th>Best</th><th>Avg</th></tr></thead>
+        <tbody>${cRows.map(r=>`<tr><td>${esc(r.c)}</td><td>${r.h}</td><td>${r.n}</td><td>${vsPar(r.best)}</td><td>${r.avg!=null?vsPar(Math.round(r.avg*10)/10):"–"}</td></tr>`).join("")}</tbody></table></div>`:`<p class="empty">Courses you play show up here with your best and average.</p>`}
+      </div>
+      <div class="history">
+        <h2>Recent rounds</h2>
+        ${rs.length?`<div class="tablewrap"><table><thead><tr><th>Day</th><th>Course</th><th>Holes</th><th>Throws</th><th>Vs par</th><th>Time</th><th></th><th>Note</th></tr></thead>
+        <tbody>${rs.slice(0,25).map(r=>{const df=roundDiff(r);return`<tr><td>${fmtDate(r.date)}</td><td>${esc(r.course||"–")}</td><td>${dash(roundHoles(r))}</td><td>${dash(roundScore(r))}</td><td class="${df==null?"":df<=0?"down":"up"}">${vsPar(df)}</td><td>${r.minutes?r.minutes+" min":"–"}</td><td><button class="link" data-rdel="${r.id}">Delete</button></td><td>${esc(r.note)}</td></tr>`}).join("")}</tbody></table></div>`:`<p class="empty">No rounds yet.</p>`}
+      </div>
+    </section>
+  </div>`;
+}
+
+function bindGolf(){
+  const st=document.getElementById("gstart");
+  if(st)st.addEventListener("submit",ev=>{
+    ev.preventDefault();
+    const course=st.elements.course.value.trim(),n=parseInt(st.elements.holes.value,10)||18,dp=Math.min(6,Math.max(2,parseInt(st.elements.par.value,10)||3));
+    const pars=lastPars(course,n)||Array(n).fill(dp);
+    state.draft={course,date:todayIso(),started:Date.now(),holes:pars.map(p=>({par:p,s:0}))};
+    saveQuiet();window.scrollTo&&window.scrollTo(0,0);
+  });
+  document.querySelectorAll("[data-h]").forEach(b=>b.addEventListener("click",()=>{
+    const d=state.draft;if(!d)return;const h=d.holes[+b.dataset.h],dv=+b.dataset.d;
+    if(b.dataset.f==="par")h.par=Math.min(6,Math.max(2,h.par+dv));
+    else h.s=h.s?Math.max(0,Math.min(15,h.s+dv)):(dv>0?h.par:Math.max(1,h.par-1));
+    saveQuiet();
+  }));
+  const fin=document.getElementById("finish");
+  if(fin)fin.addEventListener("click",()=>{
+    const d=state.draft,played=d.holes.filter(h=>h.s>0);
+    if(!played.length){alert("Record at least one hole before finishing.");return}
+    if(played.length<d.holes.length&&!confirm("Only "+played.length+" of "+d.holes.length+" holes have scores. Save just those holes?"))return;
+    const minutes=Math.max(1,Math.round((Date.now()-d.started)/60000));
+    state.rounds.push({id:Date.now(),date:d.date,course:d.course,holesData:played.map(h=>({par:h.par,s:h.s})),minutes:minutes<=600?minutes:null});
+    state.draft=null;persist("Round saved.");
+  });
+  const gg=document.getElementById("golfgps");if(gg)gg.addEventListener("click",()=>startTrack((state.draft&&state.draft.course)||"Disc golf course"));
+  const dis=document.getElementById("discard");
+  if(dis)dis.addEventListener("click",()=>{if(confirm("Discard this round? Scores entered so far will be lost.")){state.draft=null;saveQuiet()}});
+  const lg=document.getElementById("glog");
+  if(lg)lg.addEventListener("submit",ev=>{
+    ev.preventDefault();const E=lg.elements,sc=num(E.score.value);
+    if(sc==null){alert("Enter your total throws.");return}
+    state.rounds.push({id:Date.now(),date:E.date.value||todayIso(),course:E.course.value.trim(),holes:num(E.holes.value),par:num(E.par.value),score:sc,minutes:num(E.minutes.value),note:E.note.value.trim()||undefined});
+    persist("Round saved.");
+  });
+  document.querySelectorAll("[data-rdel]").forEach(b=>b.addEventListener("click",()=>{
+    if(!confirm("Delete this round?"))return;state.rounds=state.rounds.filter(r=>String(r.id)!==b.dataset.rdel);persist("Round deleted.");
+  }));
+}
+
+// ---------- steps, GPS walks, places, phone import ----------
+const PLACES_DEF=["Home","Work","Neighborhood","Park","Disc golf course"];
+function strideM(){return (num(state.settings.heightIn)||72)*0.0254*0.415}
+function perMile(){return Math.round(1609.344/strideM())}
+function walkSteps(d){return state.walks.filter(w=>w.date===d).reduce((a,w)=>a+(w.steps||0),0)}
+function dayStepsTotal(d){const e=state.entries[d]||{};if(num(e.stepsAuto)!=null)return num(e.stepsAuto);const m=num(e.steps),w=walkSteps(d);return (m==null&&!w)?null:(m||0)+w}
+function places(){return [...new Set([...PLACES_DEF,...state.walks.map(w=>w.place).filter(Boolean),...state.rounds.map(r=>r.course).filter(Boolean)])]}
+function hav(a,b){const R=6371000,t=Math.PI/180,dl=(b[0]-a[0])*t,dg=(b[1]-a[1])*t,x=Math.sin(dl/2)**2+Math.cos(a[0]*t)*Math.cos(b[0]*t)*Math.sin(dg/2)**2;return 2*R*Math.asin(Math.sqrt(x))}
+const mi=m=>m/1609.344;
+function fmtDur(ms){const s=Math.max(0,Math.floor(ms/1000)),h=Math.floor(s/3600),m=Math.floor(s%3600/60),ss=s%60;return (h?h+":"+String(m).padStart(2,"0"):m)+":"+String(ss).padStart(2,"0")}
+function trackElapsed(t){return t.elapsed+(t.paused?0:Date.now()-t.resumedAt)}
+
+function routeSvg(route,W,H,thumb){
+  const pts=(route||[]).flat();
+  if(pts.length<2)return thumb?"":`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Route map"><rect width="${W}" height="${H}" fill="var(--route-soft)" rx="8"/><text x="${W/2}" y="${H/2+5}" text-anchor="middle" font-size="15" fill="var(--muted)" font-family="Barlow, system-ui, sans-serif">Your route draws here as you walk</text></svg>`;
+  const lat0=pts.reduce((a,p)=>a+p[0],0)/pts.length,kx=Math.cos(lat0*Math.PI/180)*111320,ky=110540;
+  const P=p=>[p[1]*kx,-p[0]*ky],xy=pts.map(P);
+  let x0=Math.min(...xy.map(p=>p[0])),x1=Math.max(...xy.map(p=>p[0])),y0=Math.min(...xy.map(p=>p[1])),y1=Math.max(...xy.map(p=>p[1]));
+  const pad=thumb?4:18,dx=Math.max(x1-x0,40),dy=Math.max(y1-y0,40),sc=Math.min((W-2*pad)/dx,(H-2*pad)/dy);
+  const ox=(W-(x1-x0)*sc)/2,oy=(H-(y1-y0)*sc)/2,T=p=>{const q=P(p);return[(ox+(q[0]-x0)*sc).toFixed(1),(oy+(q[1]-y0)*sc).toFixed(1)]};
+  let g=thumb?"":`<rect width="${W}" height="${H}" fill="var(--route-soft)" rx="8"/>`;
+  for(const seg of route){if(seg.length<2)continue;g+=`<path d="M${seg.map(p=>T(p).join(",")).join(" L")}" fill="none" stroke="var(--route)" stroke-width="${thumb?2:4}" stroke-linejoin="round" stroke-linecap="round"/>`}
+  if(!thumb){const a=T(pts[0]),b=T(pts[pts.length-1]);g+=`<circle cx="${a[0]}" cy="${a[1]}" r="6" fill="var(--sage)"/><circle cx="${b[0]}" cy="${b[1]}" r="7" fill="var(--paper)" stroke="var(--route)" stroke-width="3"/>`}
+  return`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Route map">${g}</svg>`;
+}
+
+let watchId=null,wakeLock=null,lastFix=null,lastAcc=null,liveTimer=null,skips=0,lastSave=0,geoErr="";
+async function keepAwake(){try{if("wakeLock" in navigator&&!wakeLock){wakeLock=await navigator.wakeLock.request("screen");wakeLock.addEventListener("release",()=>{wakeLock=null})}}catch(e){}}
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&state.track&&!state.track.paused)keepAwake()});
+function startWatch(){
+  if(!("geolocation" in navigator)){alert("GPS isn't available in this browser.");return false}
+  if(watchId!=null)return true;
+  lastFix=null;skips=0;geoErr="";
+  watchId=navigator.geolocation.watchPosition(onFix,onGeoErr,{enableHighAccuracy:true,maximumAge:0,timeout:30000});
+  keepAwake();clearInterval(liveTimer);liveTimer=setInterval(updateLive,1000);
+  return true;
+}
+function stopWatch(){if(watchId!=null)navigator.geolocation.clearWatch(watchId);watchId=null;clearInterval(liveTimer);liveTimer=null;try{wakeLock&&wakeLock.release()}catch(e){}wakeLock=null}
+function onGeoErr(err){
+  if(err&&err.code===1){geoErr="Location permission is off. Allow location for this app in Android settings, then press Resume.";const t=state.track;if(t&&!t.paused){t.elapsed=trackElapsed(t);t.paused=true;stopWatch();saveQuiet()}}
+  else geoErr="Looking for a GPS signal…";
+  updateLive();
+}
+function onFix(p){
+  const t=state.track;if(!t||t.paused)return;
+  const c=p.coords;lastAcc=Math.round(c.accuracy);geoErr="";
+  if(c.accuracy>35){updateLive();return}
+  const pt=[+c.latitude.toFixed(6),+c.longitude.toFixed(6)],now=p.timestamp||Date.now();
+  if(!t.route.length)t.route.push([]);
+  const seg=t.route[t.route.length-1];
+  if(!lastFix){seg.push(pt);lastFix={pt,time:now}}
+  else{
+    const d=hav(lastFix.pt,pt),dt=Math.max(1,(now-lastFix.time)/1000);
+    if(d<Math.max(4,c.accuracy*0.4)){updateLive();return}
+    if(d/dt>4){ if(++skips<3){updateLive();return} t.route.push([pt]);lastFix={pt,time:now};skips=0; }
+    else{t.meters+=d;seg.push(pt);lastFix={pt,time:now};skips=0}
+  }
+  if(Date.now()-lastSave>10000){lastSave=Date.now();try{localStorage.setItem(LS,JSON.stringify(state))}catch(e){}}
+  updateLive();
+}
+function updateLive(){
+  const t=state.track;if(!t)return;const el=id=>document.getElementById(id),steps=Math.round(t.meters/strideM());
+  if(el("lv-dist"))el("lv-dist").textContent=mi(t.meters).toFixed(2);
+  if(el("lv-steps"))el("lv-steps").textContent=steps.toLocaleString();
+  if(el("lv-time"))el("lv-time").textContent=fmtDur(trackElapsed(t));
+  if(el("lv-acc"))el("lv-acc").textContent=geoErr||(t.paused?"Paused. GPS is off.":lastAcc==null?"Looking for a GPS signal…":lastAcc>35?"Weak GPS signal (±"+lastAcc+" m). Points are skipped until it improves.":"GPS accuracy ±"+lastAcc+" m");
+  if(el("lv-route"))el("lv-route").innerHTML=routeSvg(t.route,600,260,false);
+  if(el("banner-live"))el("banner-live").textContent=mi(t.meters).toFixed(2)+" mi, "+steps.toLocaleString()+" steps, "+fmtDur(trackElapsed(t));
+}
+function startTrack(place){
+  state.track={place:place||"Neighborhood",date:todayIso(),startedAt:Date.now(),resumedAt:Date.now(),elapsed:0,paused:false,meters:0,route:[[]]};
+  saveQuiet();startWatch();updateLive();
+}
+function simplifyRoute(route){
+  const total=route.reduce((a,s)=>a+s.length,0);if(total<=500)return route;
+  const k=Math.ceil(total/500);return route.map(s=>s.filter((p,i)=>i%k===0||i===s.length-1));
+}
+function finishTrack(){
+  const t=state.track;if(!t)return;stopWatch();
+  const ms=trackElapsed(t),steps=Math.round(t.meters/strideM());
+  if(t.meters<20&&!confirm("This walk recorded almost no distance. Save it anyway?")){return}
+  state.walks.push({id:Date.now(),date:t.date,source:"gps",place:t.place,meters:Math.round(t.meters),steps,minutes:Math.max(1,Math.round(ms/60000)),route:simplifyRoute(t.route.filter(s=>s.length))});
+  state.track=null;
+  persist("Walk saved: "+mi(t.meters).toFixed(2)+" mi, "+steps.toLocaleString()+" steps.");
+}
+
+let importMsg="";
+function handleImport(){
+  try{
+    const u=new URL(location.href),st=u.searchParams.get("steps");if(st==null)return;
+    const n=parseInt(String(st).replace(/[^0-9]/g,""),10);let d=u.searchParams.get("date");
+    if(!d||!/^\d{4}-\d{2}-\d{2}$/.test(d))d=todayIso();
+    if(isFinite(n)&&n>=0&&n<200000){
+      const e=Object.assign({},state.entries[d]||{});e.stepsAuto=n;e.stepsAutoAt=Date.now();state.entries[d]=e;
+      state.savedAt=Date.now();try{localStorage.setItem(LS,JSON.stringify(state))}catch(e){}
+      importMsg="Imported "+n.toLocaleString()+" steps from your phone for "+fmtDate(d)+".";tab="steps";
+    }else importMsg="The import link didn't include a valid step count.";
+    history.replaceState(null,"",u.pathname);
+  }catch(e){}
+}
+
+function stepsPanel(){
+  const t=todayIso(),wd=Math.max(1,weekOf(t)),tg=stepsTarget(wd),tot=dayStepsTotal(t),tr=state.track,e=state.entries[t]||{};
+  const pl=`<datalist id="placelist">${places().map(p=>`<option value="${esc(p)}">`).join("")}</datalist>`;
+  const lastPlace=(state.walks.slice().sort((a,b)=>b.id-a.id)[0]||{}).place||"Neighborhood";
+  // 30-day breakdown by place
+  const by={},cnt={},from=dn(t)-29;let untagged=0;
+  for(let n=from;n<=dn(t);n++){const d=iso(n),ws=state.walks.filter(w=>w.date===d),ee=state.entries[d]||{},wsum=ws.reduce((a,w)=>a+(w.steps||0),0);
+    ws.forEach(w=>{const k=w.place||"No place";by[k]=(by[k]||0)+(w.steps||0);cnt[k]=(cnt[k]||0)+1});
+    if(num(ee.stepsAuto)!=null)untagged+=Math.max(0,num(ee.stepsAuto)-wsum);else if(num(ee.steps)!=null)untagged+=num(ee.steps);}
+  if(untagged)by["Everywhere else"]=(by["Everywhere else"]||0)+untagged;
+  const rows=Object.entries(by).filter(r=>r[1]>0).sort((a,b)=>b[1]-a[1]),sum=rows.reduce((a,r)=>a+r[1],0);
+  const recent=state.walks.slice().sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id).slice(0,20);
+  const url=location.origin+location.pathname;
+  const card=tr?`
+      <h2>Walk in progress</h2>
+      <p class="today" style="margin-bottom:12px">${esc(tr.place)}</p>
+      <div class="targets" style="grid-template-columns:repeat(3,1fr)">
+        <div><b id="lv-dist">0.00</b>miles</div><div><b id="lv-steps">0</b>est. steps</div><div><b id="lv-time">0:00</b>time</div>
+      </div>
+      <p class="foot" id="lv-acc" style="margin:0 0 10px">Looking for a GPS signal…</p>
+      <div class="route" id="lv-route">${routeSvg(tr.route,600,260,false)}</div>
+      <div class="backup"><button type="button" id="tpause">${tr.paused?"Resume":"Pause"}</button><button type="button" class="quiet" id="tfinish">Finish walk</button><button type="button" class="link" id="tdiscard">Discard</button></div>
+      <p class="foot">Keep this app open. The screen stays awake while tracking. Switching apps or locking the phone pauses GPS until you come back.</p>`
+    :`
+      <h2>Track a walk</h2>
+      <form id="tstart" autocomplete="off" style="margin:0;border:0;padding:0">
+        <div class="fields"><label class="wide">Place<input type="text" name="place" list="placelist" maxlength="60" value="${esc(lastPlace)}"></label></div>
+        <p class="foot">GPS measures your distance and estimates steps at about ${perMile().toLocaleString()} per mile for your height. Keep the app open with the screen on while you walk.</p>
+        <button type="submit">Start walk</button><span class="saved" id="msg" role="status"></span>
+      </form>`;
+  return`
+  ${importMsg?`<div class="notes"><p class="note">${esc(importMsg)}</p></div>`:""}
+  <p class="status">Today: <strong>${tot!=null?tot.toLocaleString():"0"}</strong> of ${tg.toLocaleString()} steps${tot!=null&&tot>=tg?" ✓":""}. ${num(e.stepsAuto)!=null?"From your phone's step count.":"From walks and steps you've logged."}</p>
+  ${pl}
+  <div class="grid" style="margin-top:28px">
+    <section class="plan">
+      ${card}
+      <details style="margin-top:28px">
+        <summary>Add steps at a place</summary>
+        <form id="splog" autocomplete="off" style="border:0;padding:0;margin-top:14px">
+          <div class="fields">
+            <label>Date<input type="date" name="date" value="${t}" max="${t}"></label>
+            <label>Place<input type="text" name="place" list="placelist" maxlength="60"></label>
+            <label class="wide">Steps<input type="number" name="steps" inputmode="numeric"></label>
+          </div>
+          <button type="submit" class="quiet" style="margin-top:12px">Add steps</button>
+        </form>
+      </details>
+      <div class="block">
+        <h2>Phone steps</h2>
+        <p style="margin:0 0 12px">${num(e.stepsAuto)!=null?`Today's phone total: <strong>${num(e.stepsAuto).toLocaleString()}</strong>${e.stepsAutoAt?`, updated ${new Date(e.stepsAutoAt).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})}`:""}.`:"No phone total for today yet."} When a phone total exists, it replaces the day's other step counts, since your phone already counted those steps.</p>
+        <form id="phlog" autocomplete="off" style="border:0;padding:0;margin:0">
+          <div class="fields">
+            <label>Date<input type="date" name="date" value="${t}" max="${t}"></label>
+            <label>Phone total<input type="number" name="steps" inputmode="numeric" placeholder="From Fit or Samsung Health"></label>
+          </div>
+          <div class="backup"><button type="submit" class="quiet">Save phone total</button>${num(e.stepsAuto)!=null?`<button type="button" class="link" id="phclear">Clear today's phone total</button>`:""}</div>
+        </form>
+        <details style="margin-top:12px;border-top:0;padding-top:0">
+          <summary style="font-size:19px">Automatic import with Tasker</summary>
+          <p class="foot">Any automation that opens this link with a step count imports it:</p>
+          <p><code class="url">${esc(url)}?steps=8423</code> <button type="button" class="link" id="copyurl">Copy link</button></p>
+          <p class="foot">Add <code>&amp;date=YYYY-MM-DD</code> to set a different day. Without it, the steps go to today.</p>
+        </details>
+      </div>
+    </section>
+    <section>
+      <h2>Steps by place</h2>
+      ${rows.length?`<div class="places">${rows.map(([p,v])=>`<div class="prow"><div class="ptop"><span>${esc(p)}</span><span>${v.toLocaleString()} <small>${Math.round(v/sum*100)}%</small></span></div><div class="pbar"><i style="width:${(v/rows[0][1]*100).toFixed(1)}%"></i></div></div>`).join("")}</div><p class="foot">Last 30 days, ${sum.toLocaleString()} steps. "Everywhere else" is steps from your phone or typed totals that aren't tied to a walk.</p>`:`<p class="empty">Track a walk or add steps at a place to see where your steps come from.</p>`}
+      <div class="history">
+        <h2>Recent walks</h2>
+        ${recent.length?`<div class="tablewrap"><table><thead><tr><th>Day</th><th>Route</th><th>Place</th><th>Distance</th><th>Steps</th><th>Time</th><th></th></tr></thead>
+        <tbody>${recent.map(w=>`<tr><td>${fmtDate(w.date)}</td><td class="thumb">${w.source==="gps"?routeSvg(w.route,64,40,true):"<small>Logged</small>"}</td><td>${esc(w.place||"–")}</td><td>${w.meters?mi(w.meters).toFixed(2)+" mi":"–"}</td><td>${(w.steps||0).toLocaleString()}</td><td>${w.minutes?w.minutes+" min":"–"}</td><td><button class="link" data-wdel="${w.id}">Delete</button></td></tr>`).join("")}</tbody></table></div>`:`<p class="empty">No walks yet.</p>`}
+      </div>
+    </section>
+  </div>`;
+}
+
+function bindSteps(){
+  const ts=document.getElementById("tstart");
+  if(ts)ts.addEventListener("submit",ev=>{ev.preventDefault();startTrack(ts.elements.place.value.trim())});
+  const tp=document.getElementById("tpause");
+  if(tp)tp.addEventListener("click",()=>{const t=state.track;if(!t)return;
+    if(t.paused){t.paused=false;t.resumedAt=Date.now();t.route.push([]);saveQuiet();startWatch()}
+    else{t.elapsed=trackElapsed(t);t.paused=true;stopWatch();saveQuiet()}
+    updateLive();
+  });
+  const tf=document.getElementById("tfinish");if(tf)tf.addEventListener("click",finishTrack);
+  const td=document.getElementById("tdiscard");if(td)td.addEventListener("click",()=>{if(confirm("Discard this walk?")){stopWatch();state.track=null;saveQuiet()}});
+  const sp=document.getElementById("splog");
+  if(sp)sp.addEventListener("submit",ev=>{ev.preventDefault();const E=sp.elements,n=num(E.steps.value);
+    if(n==null||n<=0){alert("Enter a step count.");return}
+    state.walks.push({id:Date.now(),date:E.date.value||todayIso(),source:"manual",place:E.place.value.trim()||"No place",steps:Math.round(n)});
+    persist("Steps added.");
+  });
+  const ph=document.getElementById("phlog");
+  if(ph)ph.addEventListener("submit",ev=>{ev.preventDefault();const E=ph.elements,n=num(E.steps.value),d=E.date.value||todayIso();
+    if(n==null||n<0){alert("Enter your phone's step total.");return}
+    const e=Object.assign({},state.entries[d]||{});e.stepsAuto=Math.round(n);e.stepsAutoAt=Date.now();state.entries[d]=e;persist("Phone total saved.");
+  });
+  const pc=document.getElementById("phclear");
+  if(pc)pc.addEventListener("click",()=>{const d=todayIso(),e=Object.assign({},state.entries[d]||{});delete e.stepsAuto;delete e.stepsAutoAt;commit(d,e);persist("Phone total cleared.")});
+  const cu=document.getElementById("copyurl");
+  if(cu)cu.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(location.origin+location.pathname+"?steps=%steps");cu.textContent="Copied"}catch(e){cu.textContent="Copy failed"}});
+  document.querySelectorAll("[data-wdel]").forEach(b=>b.addEventListener("click",()=>{if(!confirm("Delete this walk?"))return;state.walks=state.walks.filter(w=>String(w.id)!==b.dataset.wdel);persist("Walk deleted.")}));
+  updateLive();
+}
 
 // ---------- saving ----------
 function persist(msg){
@@ -501,7 +885,11 @@ if("serviceWorker" in navigator&&location.protocol!=="file:"){
 }
 try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
 
+let rzT=null,lastW=window.innerWidth;window.addEventListener("resize",()=>{if(Math.abs(window.innerWidth-lastW)<40)return;lastW=window.innerWidth;clearTimeout(rzT);rzT=setTimeout(()=>{const a=document.activeElement;if(!a||!/INPUT|SELECT|TEXTAREA/.test(a.tagName))render()},250)});
+handleImport();
+if(state.track&&!state.track.paused){state.track.route.push([]);startWatch()}
 render();
+updateLive();
 })();
 </script>
 </body>

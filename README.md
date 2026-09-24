@@ -1,6 +1,6 @@
-# Road to 200
+# Forgeway
 
-A weight, daily-routine, steps and disc golf tracker. One codebase, two ways to use it:
+Forgeway (formerly Road to 200): a weight, food, workout, steps and disc golf tracker. One codebase, two ways to use it:
 
 | | How to get it | Steps |
 |---|---|---|

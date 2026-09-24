@@ -10,7 +10,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="ROAD TO 200"
+        android:text="FORGEWAY"
         android:textColor="#97A8AB"
         android:textSize="11sp"
         android:textStyle="bold"

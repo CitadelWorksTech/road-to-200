@@ -1,8 +1,8 @@
 {
   "appId": "tech.citadelworks.roadto200",
-  "appName": "Road to 200",
+  "appName": "Forgeway",
   "webDir": "www",
   "android": {
-    "backgroundColor": "#F2F4F1"
+    "backgroundColor": "#172C3D"
   }
 }

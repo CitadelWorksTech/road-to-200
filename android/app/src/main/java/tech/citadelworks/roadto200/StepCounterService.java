@@ -97,7 +97,7 @@ public class StepCounterService extends Service implements SensorEventListener {
     private void createChannel() {
         if (Build.VERSION.SDK_INT >= 26) {
             NotificationChannel ch = new NotificationChannel(CHANNEL_ID, "Step counting", NotificationManager.IMPORTANCE_LOW);
-            ch.setDescription("Shows today's steps while Road to 200 counts them.");
+            ch.setDescription("Shows today's steps while Forgeway counts them.");
             ch.setShowBadge(false);
             NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             if (nm != null) nm.createNotificationChannel(ch);
@@ -110,7 +110,7 @@ public class StepCounterService extends Service implements SensorEventListener {
         return new NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_stat_steps)
             .setContentTitle("Today: " + NumberFormat.getIntegerInstance().format(steps) + " steps")
-            .setContentText("Road to 200 is counting your steps")
+            .setContentText("Forgeway is counting your steps")
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setShowWhen(false)

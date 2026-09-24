@@ -142,7 +142,7 @@ public final class ReminderScheduler {
         if (nm == null) return;
         if (Build.VERSION.SDK_INT >= 26) {
             NotificationChannel ch = new NotificationChannel(CHANNEL_ID, "Reminders", NotificationManager.IMPORTANCE_DEFAULT);
-            ch.setDescription("Weigh-in, push-up and step reminders from Road to 200.");
+            ch.setDescription("Weigh-in, push-up and step reminders from Forgeway.");
             nm.createNotificationChannel(ch);
         }
         Intent open = new Intent(ctx, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);

@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Road to 200</title>
+<title>Forgeway</title>
 <meta name="theme-color" content="#F2F4F1" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#131B1F" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Road to 200">
+<meta name="apple-mobile-web-app-title" content="Forgeway">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -256,7 +256,7 @@ summary{font-family:var(--cond);font-size:22px;font-weight:600;cursor:pointer}
 const DEF={settings:{startDate:"2026-09-23",startWeight:285,goal:255,checkpoint:270,calories:2300,protein:180,weeks:24,heightIn:72},entries:{},rounds:[],draft:null,walks:[],track:null,savedAt:0};
 const LS="road255-state";
 // Standalone app build: data is stored on this device in localStorage.
-const HEAD='<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n<title>Road to 200</title>\n<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">\n';
+const HEAD='<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n<title>Forgeway</title>\n<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">\n';
 const STR_A=["Chair squats, 10–15","Incline push-ups (counter), 8–12","Glute bridges, 15","Plank, 20–40 sec"];
 const STR_B=["Reverse lunges, 8 per leg","Table or doorframe rows, 10–12","Step-ups (stairs), 10 per leg","Dead bugs, 10 per side"];
 
@@ -921,7 +921,7 @@ function bindHc(){
 async function nativeExport(){
   const name=backupName(),data=JSON.stringify(state,null,2);
   const w=await FS.writeFile({path:name,data,directory:"CACHE",encoding:"utf8"});
-  await SH.share({title:"Road to 200 backup",files:[w.uri],dialogTitle:"Save or send your backup"});
+  await SH.share({title:"Forgeway backup",files:[w.uri],dialogTitle:"Save or send your backup"});
 }
 
 // ---------- weekly check-in ----------
@@ -1234,7 +1234,7 @@ function remindersHtml(){
     <p class="foot">Reminders only go off when you still need them: no weigh-in logged yet, push-ups under today's target, or steps under today's target.</p>
   </form>
   <h3>Home-screen widget</h3>
-  <p class="foot" style="margin-top:0">Long-press your home screen, tap Widgets, find Road to 200, and drag it out. It shows today's steps, push-ups and calories left.</p>`;
+  <p class="foot" style="margin-top:0">Long-press your home screen, tap Widgets, find Forgeway, and drag it out. It shows today's steps, push-ups and calories left.</p>`;
 }
 function bindReminders(){
   const f=document.getElementById("remform");if(!f)return;
@@ -1522,10 +1522,11 @@ function settingsPage(){
       <form id="profile" autocomplete="off" style="border:0;padding:0;margin:0"><div class="fields">
         <label class="wide">Name<input type="text" name="name" maxlength="40" value="${esc(S.name||"")}" placeholder="Your name"></label>
         <label>Height (in)<input type="number" name="heightIn" value="${S.heightIn}"></label>
+        <label class="wide">Header title<input type="text" name="headline" maxlength="30" value="${esc(S.headline||"Road to 200")}"></label>
       </div><button type="submit" class="quiet" style="margin-top:12px">Save profile</button></form>
       <h3>Account</h3>
       <p class="foot" style="margin-top:0">No sign-in needed. Everything is stored on this phone: ${days} days logged, ${state.rounds.length} rounds, ${state.sessions.length} activity sessions, ${state.workouts.length} guided workouts, ${photoCount} photos, ${state.goals.length} goals.</p>
-      <p class="foot">Road to 200 · ${NATIVE?"Android app":"Web app"}</p>
+      <p class="foot">Forgeway · ${NATIVE?"Android app":"Web app"}</p>
     </section>
     <section class="setsec"><h2>Plan</h2>
       <form id="settings" style="border:0;padding:0;margin:0">
@@ -1560,7 +1561,7 @@ function bindSettingsPage(){
   document.getElementById("import").addEventListener("change",ev=>{const fl=ev.target.files&&ev.target.files[0];if(fl)importData(fl);ev.target.value=""});
   const ad=document.getElementById("actadd");if(ad)ad.addEventListener("click",activityPicker);
   const pf=document.getElementById("profile");
-  pf.addEventListener("submit",ev=>{ev.preventDefault();const n={...state.settings};n.name=pf.elements.name.value.trim();const h=num(pf.elements.heightIn.value);if(h&&h>0)n.heightIn=h;state.settings=n;persist("Profile saved.")});
+  pf.addEventListener("submit",ev=>{ev.preventDefault();const n={...state.settings};n.name=pf.elements.name.value.trim();n.headline=pf.elements.headline.value.trim()||"Road to 200";const h=num(pf.elements.heightIn.value);if(h&&h>0)n.heightIn=h;state.settings=n;persist("Profile saved.")});
   const s=document.getElementById("settings");
   s.addEventListener("submit",ev=>{ev.preventDefault();const n={...state.settings};if(s.elements.startDate.value)n.startDate=s.elements.startDate.value;
     ["startWeight","checkpoint","goal","calories","protein","weeks","waterGoal"].forEach(k=>{const v=num(s.elements[k].value);if(v!=null&&v>0)n[k]=v});state.settings=n;persist("Plan saved.")});
@@ -1581,7 +1582,7 @@ function render(){
   else if(tab==="workout")panel=routinePanel()+moodInsights()+goalsSection("workout","Workout goals & milestones");
   else panel=activityPanel();
   app.innerHTML=`
-  <div class="top"><div><h1>Road to 200</h1><div class="where">${S.name?esc(S.name)+", ":""}${where}</div></div><button type="button" class="gear" id="opensettings" aria-label="Settings">${GEAR}</button></div>
+  <div class="top"><div><h1>${esc(S.headline||"Road to 200")}</h1><div class="where">${S.name?esc(S.name)+", ":""}${where}</div></div><button type="button" class="gear" id="opensettings" aria-label="Settings">${GEAR}</button></div>
   <div class="tabs" role="tablist" aria-label="Tracker areas">
     <button role="tab" id="tab-weight" aria-selected="${tab==="weight"}" aria-controls="panel" data-tab="weight">Weight</button>
     <button role="tab" id="tab-food" aria-selected="${tab==="food"}" aria-controls="panel" data-tab="food">Food</button>
@@ -1798,8 +1799,8 @@ async function shareCard(icon,title,sub){
   const words=title.split(" "),lines=[];let cur="";for(const w of words){const t=cur?cur+" "+w:w;if(x.measureText(t).width>900&&cur){lines.push(cur);cur=w}else cur=t}lines.push(cur);
   lines.slice(0,3).forEach((l,i)=>x.fillText(l,540,610+i*96-(lines.length-1)*48));
   x.fillStyle="#97A8AB";x.font=`500 44px ${fam}`;x.fillText(sub,540,820);
-  x.fillStyle="#6DB0D0";x.font=`700 46px ${fam}`;x.fillText("ROAD TO 200",540,960);
-  const blob=await new Promise(r=>c.toBlob(r,"image/png")),fname="road-to-200-"+title.toLowerCase().replace(/[^a-z0-9]+/g,"-").slice(0,40)+".png";
+  x.fillStyle="#6DB0D0";x.font=`700 46px ${fam}`;x.fillText("FORGEWAY",540,960);
+  const blob=await new Promise(r=>c.toBlob(r,"image/png")),fname="forgeway-"+title.toLowerCase().replace(/[^a-z0-9]+/g,"-").slice(0,40)+".png";
   try{
     if(NATIVE&&FS&&SH){const b64=await new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(String(fr.result).split(",")[1]);fr.readAsDataURL(blob)});
       const w=await FS.writeFile({path:"share/"+fname,data:b64,directory:"CACHE",recursive:true});await SH.share({title,files:[w.uri],dialogTitle:"Share your milestone"});return}
@@ -1830,7 +1831,7 @@ function autoBackupHtml(){
   if(!(NATIVE&&FS))return"";
   let last=0;try{last=+localStorage.getItem("road200-ab")||0}catch(e){}
   return`<h3>Automatic backup</h3><p class="foot" style="margin-top:0">On. A copy of your data is saved after every change, and Android backs it up to your Google account. Last saved: <strong>${last?new Date(last).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}):"not yet"}</strong>.</p>
-  <p class="foot">Make sure it's allowed: Android <strong>Settings → Google → Backup</strong> (or <strong>Accounts and backup</strong> on Samsung), with <strong>Backup by Google One</strong> turned on. On a new phone, install Road to 200 from the Play Store with the same Google account and it offers to restore. Photos aren't included.</p>`;
+  <p class="foot">Make sure it's allowed: Android <strong>Settings → Google → Backup</strong> (or <strong>Accounts and backup</strong> on Samsung), with <strong>Backup by Google One</strong> turned on. On a new phone, install Forgeway from the Play Store with the same Google account and it offers to restore. Photos aren't included.</p>`;
 }
 
 // ---------- saving ----------
@@ -1840,13 +1841,13 @@ function persist(msg){
   try{localStorage.setItem(LS,JSON.stringify(state))}catch(e){ok=false}
   checkMilestones();checkGoals();render();nativeSync();autoBackup();say(ok?msg:"Couldn't save. Your phone's storage may be full or blocked for this app.");
 }
-function backupName(){return "road-to-200-backup-"+todayIso()+".json"}
+function backupName(){return "forgeway-backup-"+todayIso()+".json"}
 async function exportData(){
   if(NATIVE&&FS&&SH){try{await nativeExport()}catch(e){if(!/cancel/i.test(errText(e)))alert("Couldn't export the backup: "+errText(e))}return}
   const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
   const file=new File([blob],backupName(),{type:"application/json"});
   try{
-    if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:"Road to 200 backup"});return}
+    if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:"Forgeway backup"});return}
   }catch(e){if(e&&e.name==="AbortError")return}
   const url=URL.createObjectURL(blob),a=document.createElement("a");
   a.href=url;a.download=backupName();document.body.appendChild(a);a.click();a.remove();
@@ -1861,7 +1862,7 @@ function importData(file){
       const n=Object.keys(d.entries).length;
       if(!confirm("Replace everything in the app with this backup ("+n+" days)?"))return;
       state=norm(d);persist("Backup restored: "+n+" days.");
-    }catch(e){alert("That file isn't a Road to 200 backup. Choose a .json file exported from this app.")}
+    }catch(e){alert("That file isn't a Forgeway backup. Choose a .json file exported from this app.")}
   };
   r.readAsText(file);
 }

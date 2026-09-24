@@ -47,7 +47,7 @@
         <receiver
             android:name=".RoadWidgetProvider"
             android:exported="false"
-            android:label="Road to 200">
+            android:label="Forgeway">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>

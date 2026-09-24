@@ -78,6 +78,7 @@ public class StepCounterService extends Service implements SensorEventListener {
             lastNotifyAt = now;
             NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             if (nm != null) nm.notify(NOTIFICATION_ID, buildNotification(today));
+            try { RoadWidgetProvider.updateAll(this); } catch (Exception ignored) {}
         }
     }
 

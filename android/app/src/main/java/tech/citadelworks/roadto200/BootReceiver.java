@@ -10,6 +10,8 @@ public class BootReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         String a = intent == null ? null : intent.getAction();
         if (Intent.ACTION_BOOT_COMPLETED.equals(a) || Intent.ACTION_MY_PACKAGE_REPLACED.equals(a)) {
+            try { ReminderScheduler.scheduleNext(context); } catch (Exception ignored) {}
+            try { RoadWidgetProvider.updateAll(context); } catch (Exception ignored) {}
             if (StepStore.isEnabled(context)) {
                 try { StepCounterService.start(context); } catch (Exception ignored) {}
             }

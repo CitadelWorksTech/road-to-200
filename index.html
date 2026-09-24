@@ -73,6 +73,45 @@ h3{font-size:20px;font-weight:600;margin:18px 0 6px}
 .pbar{height:10px;background:var(--line);border-radius:5px;overflow:hidden;margin-top:4px}
 .pbar i{display:block;height:100%;background:var(--route);border-radius:5px}
 code.url{font-size:14px;word-break:break-all;background:var(--field);border:1px solid var(--line);padding:2px 6px;border-radius:4px}
+details.checkin{margin:22px 0 0;border:1px solid var(--line);border-left:4px solid var(--route);border-radius:6px;padding:12px 16px;background:var(--field)}
+details.checkin summary{font-size:22px}
+details.checkin p{margin:10px 0}
+.pill{font-family:var(--body);font-size:14px;font-weight:600;background:var(--route-soft);color:var(--route);border-radius:999px;padding:2px 10px;margin-left:8px;vertical-align:middle}
+.count{font-family:var(--body);font-size:15px;font-weight:500;color:var(--muted)}
+.ms{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.ms .m{display:flex;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:8px;opacity:.55}
+.ms .m.got{opacity:1;border-color:var(--sage);background:var(--field)}
+.ms .mi{font-size:24px;line-height:1}
+.ms b{display:block;font-size:15px;line-height:1.25}
+.ms small{color:var(--muted);font-size:13px}
+.thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-top:14px}
+.thumbs figure{margin:0}
+.thumbs img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:6px;display:block}
+.thumbs figcaption{font-size:13px;color:var(--muted);margin-top:4px}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.compare select{width:100%;margin-bottom:6px}
+.compare img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:6px;display:block}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,40px);opacity:0;pointer-events:none;background:var(--ink);color:var(--paper);padding:12px 18px;border-radius:10px;font-weight:600;max-width:min(92vw,520px);z-index:60;transition:all .3s}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+#wo{position:fixed;inset:0;background:var(--paper);z-index:50;overflow:auto;padding:calc(20px + env(safe-area-inset-top,0px)) 20px calc(24px + env(safe-area-inset-bottom,0px))}
+.woin{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:10px;min-height:100%}
+.woin h2{font-size:40px;margin:6px 0 0}
+.wok{font-family:var(--cond);font-size:20px;font-weight:600;color:var(--muted);margin:0}
+.wobig{font-family:var(--cond);font-size:88px;font-weight:700;line-height:1;margin:18px 0 6px}
+.wobig.sm{font-size:40px;margin:4px 0}
+.wobar{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.wobar i{display:block;height:100%;background:var(--route)}
+.wopush{display:flex;align-items:center;justify-content:space-between;gap:12px;font-weight:600;margin:10px 0}
+#wo .backup button{flex:1;min-height:56px;font-size:19px}
+.woquit{align-self:center;margin-top:18px}
+.hole-x{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center;padding:4px 0 10px 2.4em;font-size:14px;color:var(--muted);border-bottom:1px solid var(--line)}
+.hole.played{border-bottom:0}
+.chip{min-height:32px;padding:2px 12px;font-size:14px;background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:999px}
+.chip.yes{border-color:var(--sage);color:var(--sage)}
+.chip.no{border-color:var(--amber);color:var(--amber)}
+.stepper.sm button{width:32px;height:32px;font-size:18px}
+.stepper.sm b{font-size:18px;min-width:1.4em}
+input.tm{width:auto;min-height:36px;padding:4px 6px;font-size:15px;margin-left:6px}
 .status{font-size:19px;max-width:64ch;margin:10px 0 0}
 .status strong{font-weight:600}
 .chart{margin:22px 0 8px;width:100%;overflow-x:auto}
@@ -153,7 +192,7 @@ const STR_B=["Reverse lunges, 8 per leg","Table or doorframe rows, 10–12","Ste
 
 function norm(s){
   s=s&&typeof s==="object"?s:{};
-  return {settings:Object.assign({},DEF.settings,s.settings||{}),entries:Object.assign({},s.entries||{}),rounds:Array.isArray(s.rounds)?s.rounds:[],draft:s.draft&&Array.isArray(s.draft.holes)?s.draft:null,walks:Array.isArray(s.walks)?s.walks:[],track:s.track&&Array.isArray(s.track.route)?s.track:null,savedAt:s.savedAt||0};
+  return {settings:Object.assign({},DEF.settings,s.settings||{}),entries:Object.assign({},s.entries||{}),rounds:Array.isArray(s.rounds)?s.rounds:[],draft:s.draft&&Array.isArray(s.draft.holes)?s.draft:null,walks:Array.isArray(s.walks)?s.walks:[],track:s.track&&Array.isArray(s.track.route)?s.track:null,workouts:Array.isArray(s.workouts)?s.workouts:[],throws:Array.isArray(s.throws)?s.throws:[],milestones:s.milestones&&typeof s.milestones==="object"?s.milestones:{},savedAt:s.savedAt||0};
 }
 function load(){
   let s=null;
@@ -315,7 +354,7 @@ function render(){
     <button role="tab" id="tab-golf" aria-selected="${tab==="golf"}" aria-controls="panel" data-tab="golf">Disc golf</button>
   </div>
   ${state.track&&tab!=="steps"?`<div class="live-banner"><span>Walk ${state.track.paused?"paused":"tracking"}: <b id="banner-live"></b></span><button type="button" class="link" data-tab="steps">Open</button></div>`:""}
-  <div id="panel" role="tabpanel" aria-labelledby="tab-${tab}">${tab==="weight"?weightPanel():tab==="golf"?golfPanel():tab==="steps"?stepsPanel():routinePanel()}</div>
+  <div id="panel" role="tabpanel" aria-labelledby="tab-${tab}">${tab==="weight"?weightPanel()+weightExtras():tab==="golf"?golfPanel()+golfExtras():tab==="steps"?stepsPanel():routinePanel()}</div>
   <details>
     <summary>Plan settings</summary>
     <form id="settings" style="border:0;padding:0;margin:0">
@@ -332,6 +371,7 @@ function render(){
       <button type="submit" class="quiet" ${readOnly?"disabled":""}>Save settings</button>
       <p class="foot">Strength days alternate A and B each week. The steps target starts at 5,500 and rises by 1,000 every two weeks to 10,000. Daily push-ups start at 20 and rise by 10 every two weeks to 60. At 60, move from counter to chair to floor.</p>
     </form>
+    ${remindersHtml()}
     <h3>Backup</h3>
     <p class="foot" style="margin-top:0">Your data lives only on this phone. Export a backup every week or two, and restore it here if you switch phones or clear your browser.</p>
     <div class="backup"><button type="button" class="quiet" id="export">Export backup</button><label class="quiet filebtn">Restore backup<input type="file" id="import" accept="application/json,.json"></label></div>
@@ -398,6 +438,7 @@ function routinePanel(){
       </div>
       <div class="daily"><p><strong>Every day: ${pushTarget(wd)} push-ups</strong>, split into 3–4 sets through the day.</p><p>Stop each set 2–3 reps short of failure. Start with hands on a counter and lower the surface once all sets feel easy.${plan.label.startsWith("Strength A")?" Today's circuit push-ups count toward the total.":""}</p><p>${tt!=null?"Today so far: "+tt+" of "+pushTarget(wd)+(tt>=pushTarget(wd)?" ✓. ":". "):""}${st?"Streak: "+st+" day"+(st>1?"s":"")+" on target.":"No streak yet. Hit today's target to start one."}</p></div>
       <p class="today">${esc(plan.label)}</p>
+      ${workoutButton(plan)}
       ${plan.moves.length?`<ul class="moves">${plan.moves.map(m=>`<li>${m}</li>`).join("")}</ul><p class="foot">3 rounds, 60–90 sec rest. When every round hits the top of the range, make it harder.</p>`:""}
 
       <form id="rlog" autocomplete="off">
@@ -452,7 +493,9 @@ function bind(){
     b.addEventListener("click",()=>setTab(b.dataset.tab));
     b.addEventListener("keydown",ev=>{if(ev.key==="ArrowRight"||ev.key==="ArrowLeft"){{const o=["weight","routine","steps","golf"],i=o.indexOf(tab);setTab(o[(i+(ev.key==="ArrowRight"?1:3))%4])};document.getElementById("tab-"+tab).focus()}});
   });
-  if(tab==="golf")bindGolf();else if(tab==="steps")bindSteps();else{
+  bindReminders();
+  if(tab==="weight")bindWeightExtras();else if(tab==="routine")bindRoutineExtras();
+  if(tab==="golf"){bindGolf();bindGolfExtras()}else if(tab==="steps")bindSteps();else{
   const isW=tab==="weight",keys=isW?WKEYS:RKEYS;
   const f=document.getElementById(isW?"wlog":"rlog"),F=n=>f.elements[n];
   F("date").addEventListener("change",()=>{const v=F("date").value;if(v){if(isW)wDate=v;else rDate=v;render()}});
@@ -508,7 +551,7 @@ function roundDiff(r){const p=roundPar(r),s=roundScore(r);return p!=null&&s!=nul
 function courses(){return [...new Set(state.rounds.map(r=>r.course).filter(Boolean))].sort()}
 function roundsInWeek(w){return state.rounds.filter(r=>weekOf(r.date)===w).length}
 function golfStreak(){let w=weekOf(todayIso());if(!roundsInWeek(w))w--;let c=0;while(c<520&&roundsInWeek(w)){c++;w--}return c}
-function saveQuiet(){state.savedAt=Date.now();try{localStorage.setItem(LS,JSON.stringify(state))}catch(e){}render()}
+function saveQuiet(){state.savedAt=Date.now();try{localStorage.setItem(LS,JSON.stringify(state))}catch(e){}render();nativeSync()}
 function lastPars(course,n){const r=state.rounds.filter(x=>x.course===course&&x.holesData&&x.holesData.length===n).sort((a,b)=>b.date.localeCompare(a.date))[0];return r?r.holesData.map(h=>h.par):null}
 
 function golfChart(rs){
@@ -543,7 +586,7 @@ function golfPanel(){
         <span class="stepper"><button type="button" data-h="${i}" data-f="par" data-d="-1" aria-label="Hole ${i+1} par down">−</button><b>${h.par}</b><button type="button" data-h="${i}" data-f="par" data-d="1" aria-label="Hole ${i+1} par up">+</button></span>
         <span class="stepper"><button type="button" data-h="${i}" data-f="s" data-d="-1" aria-label="Hole ${i+1} throws down">−</button><b>${h.s||"–"}</b><button type="button" data-h="${i}" data-f="s" data-d="1" aria-label="Hole ${i+1} throws up">+</button></span>
         <span class="hd ${h.s?(h.s-h.par<0?"down":h.s-h.par>0?"up":""):""}">${h.s?vsPar(h.s-h.par):""}</span>
-      </div>`).join("")}
+      </div>${holeExtras(h,i)}`).join("")}
     </div>
     <p class="foot">The first tap on + sets throws to par. Pars are remembered for next time you play this course.</p>
     <div class="backup"><button type="button" id="finish">Finish round</button><button type="button" class="quiet" id="discard">Discard</button>${state.track?"":`<button type="button" class="link" id="golfgps">Track this round's walk with GPS</button>`}</div>`;
@@ -623,7 +666,7 @@ function bindGolf(){
     if(!played.length){alert("Record at least one hole before finishing.");return}
     if(played.length<d.holes.length&&!confirm("Only "+played.length+" of "+d.holes.length+" holes have scores. Save just those holes?"))return;
     const minutes=Math.max(1,Math.round((Date.now()-d.started)/60000));
-    state.rounds.push({id:Date.now(),date:d.date,course:d.course,holesData:played.map(h=>({par:h.par,s:h.s})),minutes:minutes<=600?minutes:null});
+    state.rounds.push({id:Date.now(),date:d.date,course:d.course,holesData:played.map(h=>{const o={par:h.par,s:h.s};if(h.fw===true||h.fw===false)o.fw=h.fw;if(h.putts)o.putts=h.putts;return o}),minutes:minutes<=600?minutes:null});
     state.draft=null;persist("Round saved.");
   });
   const gg=document.getElementById("golfgps");if(gg)gg.addEventListener("click",()=>startTrack((state.draft&&state.draft.course)||"Disc golf course"));
@@ -873,7 +916,7 @@ function quietRender(){const a=document.activeElement;if(a&&/INPUT|SELECT|TEXTAR
 async function scRefresh(){
   if(!SC)return;
   try{applySteps(await SC.getDays());sc.error=""}catch(e){sc.checked=true;sc.error=errText(e)}
-  quietRender();
+  checkMilestones();quietRender();nativeSync();
 }
 async function scStart(){
   if(!SC||sc.busy)return;sc.busy=true;render();
@@ -915,12 +958,331 @@ async function nativeExport(){
   await SH.share({title:"Road to 200 backup",files:[w.uri],dialogTitle:"Save or send your backup"});
 }
 
+// ---------- weekly check-in ----------
+function weekDates(w){const s=dn(state.settings.startDate)+(w-1)*7,t=dn(todayIso()),out=[];for(let n=s;n<s+7&&n<=t;n++)out.push(iso(n));return out}
+function weekAdherence(w){
+  const S=state.settings,ds=weekDates(w),st=stepsTarget(w);
+  const c={days:ds.length,cal:0,calLogged:0,pro:0,steps:0,push:0,sessions:0,weighins:0};
+  for(const d of ds){
+    const e=state.entries[d]||{},cal=num(e.calories),pro=num(e.protein),sp=dayStepsTotal(d);
+    if(cal!=null){c.calLogged++;if(cal<=S.calories+100)c.cal++}
+    if(pro!=null&&pro>=S.protein-10)c.pro++;
+    if(sp!=null&&sp>=st)c.steps++;
+    if(pushHit(d))c.push++;
+    if(e.session)c.sessions++;
+    if(num(e.weight)!=null)c.weighins++;
+  }
+  c.score=c.days?Math.round((c.cal+c.pro+c.steps+c.push)/(c.days*4)*100):null;
+  const wk=weekly().find(r=>r.w===w);c.weight=wk&&wk.weight!=null?wk.weight:null;
+  const prev=weekly().find(r=>r.w===w-1);c.change=c.weight!=null&&prev&&prev.weight!=null?r1(c.weight-prev.weight):null;
+  return c;
+}
+function projection(){
+  const ws=weights(),t=dn(todayIso()),pts=ws.filter(p=>p.n>t-28);
+  if(pts.length<5||pts[pts.length-1].n-pts[0].n<7)return null;
+  const mx=avg(pts.map(p=>p.n)),my=avg(pts.map(p=>p.w));
+  let sxy=0,sxx=0;pts.forEach(p=>{sxy+=(p.n-mx)*(p.w-my);sxx+=(p.n-mx)**2});
+  const slope=sxx?sxy/sxx:0,now=my+slope*(t-mx);
+  const eta=target=>slope<0&&now>target?t+Math.ceil((now-target)/-slope):null;
+  return{perWeek:r1(slope*7),now:r1(now),check:eta(state.settings.checkpoint),goal:eta(state.settings.goal)};
+}
+function checkinHtml(){
+  const w=weekOf(todayIso());if(w<1)return"";
+  const cur=weekAdherence(w),last=w>1?weekAdherence(w-1):null,pr=projection(),S=state.settings;
+  const isSun=new Date().getDay()===0;
+  const row=(label,a,b)=>`<tr><td>${label}</td>${last?`<td>${b}</td>`:""}<td>${a}</td></tr>`;
+  const f=(c,k)=>`${c[k]}/${c.days}`;
+  const fmtEta=n=>n?new Date(n*864e5).toLocaleDateString(undefined,{month:"short",day:"numeric",timeZone:"UTC"}):"–";
+  let proj;
+  if(!pr)proj=`<p class="foot">Log at least 5 weigh-ins over a week or more to see a projection.</p>`;
+  else if(pr.perWeek>=0)proj=`<p>Trend: <strong>${pr.perWeek>0?"+":""}${pr.perWeek} lb/week</strong>. The last four weeks are flat or up, so there's no projection yet. Check weekend logging first.</p>`;
+  else proj=`<p>Trend: <strong>${pr.perWeek} lb/week</strong>. At this pace: <strong>${S.checkpoint} by ${fmtEta(pr.check)}</strong>${pr.goal?`, <strong>${S.goal} by ${fmtEta(pr.goal)}</strong>`:""}.</p>${pr.perWeek<-2.5?`<p class="foot">That's faster than 2.5 lb/week. Consider eating about 200 more calories to protect muscle.</p>`:""}`;
+  return`<details class="checkin" ${isSun?"open":""}>
+    <summary>${isSun?"Sunday check-in":"Weekly check-in"}${cur.score!=null?` <span class="pill">${cur.score}% this week</span>`:""}</summary>
+    ${proj}
+    <div class="tablewrap"><table>
+      <thead><tr><th></th>${last?`<th>Week ${w-1}</th>`:""}<th>Week ${w}${cur.days<7?" so far":""}</th></tr></thead>
+      <tbody>
+        ${row("Avg weight",cur.weight!=null?r1(cur.weight):"–",last&&last.weight!=null?r1(last.weight):"–")}
+        ${row("Change",cur.change!=null?(cur.change>0?"+":"")+cur.change:"–",last&&last.change!=null?(last.change>0?"+":"")+last.change:"–")}
+        ${row("Calories on target",f(cur,"cal"),last?f(last,"cal"):"")}
+        ${row("Protein on target",f(cur,"pro"),last?f(last,"pro"):"")}
+        ${row("Step target hit",f(cur,"steps"),last?f(last,"steps"):"")}
+        ${row("Push-up target hit",f(cur,"push"),last?f(last,"push"):"")}
+        ${row("Sessions done",cur.sessions,last?last.sessions:"")}
+        ${row("Adherence",cur.score!=null?cur.score+"%":"–",last&&last.score!=null?last.score+"%":"–")}
+      </tbody></table></div>
+    <p class="foot">Adherence counts days on target for calories (within 100 of ${S.calories.toLocaleString()}), protein, steps and push-ups. 80% or better is a strong week.</p>
+  </details>`;
+}
+
+// ---------- milestones ----------
+function bestStreak(pred){const ds=sortedDates();let best=0,run=0,prev=null;for(const d of ds){const n=dn(d);if(pred(d)){run=(prev!=null&&n===prev+1&&run)?run+1:1}else run=0;prev=n;best=Math.max(best,run)}return best}
+function currentAvg(){const ws=weights();return ws.length?rolling(ws,ws[ws.length-1].n):null}
+const MILESTONES=[
+  {id:"weigh1",icon:"⚖️",name:"First weigh-in",test:()=>weights().length>0},
+  ...[5,10,15,20,25,30,40,50].map(n=>({id:"lost"+n,icon:"⬇️",name:`${n} lb down`,test:()=>{const a=currentAvg();return a!=null&&state.settings.startWeight-a>=n}})),
+  {id:"checkpoint",icon:"🚩",name:"Passed the checkpoint",test:()=>{const a=currentAvg();return a!=null&&a<=state.settings.checkpoint}},
+  {id:"goal",icon:"🏁",name:"Reached the goal",test:()=>{const a=currentAvg();return a!=null&&a<=state.settings.goal}},
+  {id:"log7",icon:"📓",name:"7 days of food logged in a row",test:()=>bestStreak(d=>num(state.entries[d].calories)!=null)>=7},
+  {id:"steps10k",icon:"👟",name:"First 10,000-step day",test:()=>Object.keys(state.entries).some(d=>(dayStepsTotal(d)||0)>=10000)},
+  {id:"steps7",icon:"📈",name:"Step target 7 days straight",test:()=>bestStreak(d=>(dayStepsTotal(d)||0)>=stepsTarget(weekOf(d)))>=7},
+  {id:"mile",icon:"🗺️",name:"First GPS mile",test:()=>state.walks.some(w=>(w.meters||0)>=1609)},
+  {id:"push7",icon:"💪",name:"7-day push-up streak",test:()=>bestStreak(pushHit)>=7},
+  {id:"push30",icon:"🔥",name:"30-day push-up streak",test:()=>bestStreak(pushHit)>=30},
+  {id:"floor",icon:"🧱",name:"Push-ups from the floor",test:()=>Object.values(state.entries).some(e=>e.surface==="floor")},
+  {id:"wo1",icon:"⏱️",name:"First guided workout",test:()=>state.workouts.length>=1},
+  {id:"wo12",icon:"🏋️",name:"12 guided workouts",test:()=>state.workouts.length>=12},
+  {id:"golf1",icon:"🥏",name:"First disc golf round",test:()=>state.rounds.length>0},
+  {id:"golfpar",icon:"🎯",name:"Round at or under par",test:()=>state.rounds.some(r=>(roundHoles(r)||0)>=9&&roundDiff(r)!=null&&roundDiff(r)<=0)},
+  {id:"golf4",icon:"📅",name:"Disc golf 4 weeks in a row",test:()=>golfStreak()>=4},
+  {id:"throw300",icon:"🚀",name:"300-foot throw",test:()=>state.throws.some(t=>t.feet>=300)},
+  {id:"photo1",icon:"📸",name:"First progress photo",test:()=>photoCount>0},
+];
+let newMilestones=[];
+function checkMilestones(){
+  const t=todayIso();let added=[];
+  for(const m of MILESTONES){if(!state.milestones[m.id]){let ok=false;try{ok=m.test()}catch(e){}if(ok){state.milestones[m.id]=t;added.push(m)}}}
+  if(added.length){state.savedAt=Date.now();try{localStorage.setItem(LS,JSON.stringify(state))}catch(e){}newMilestones=added;showToast((added.length>1?added.length+" new milestones: ":"New milestone: ")+added.map(m=>m.icon+" "+m.name).join(", "))}
+}
+function milestonesHtml(){
+  const got=MILESTONES.filter(m=>state.milestones[m.id]).length;
+  return`<div class="block"><h2>Milestones <small class="count">${got} of ${MILESTONES.length}</small></h2>
+    <div class="ms">${MILESTONES.map(m=>{const d=state.milestones[m.id];return`<div class="m ${d?"got":""}"><span class="mi" aria-hidden="true">${d?m.icon:"🔒"}</span><span><b>${esc(m.name)}</b><small>${d?fmtDate(d):"Not yet"}</small></span></div>`}).join("")}</div></div>`;
+}
+let toastT=null;
+function showToast(msg){
+  let el=document.getElementById("toast");
+  if(!el){el=document.createElement("div");el.id="toast";el.setAttribute("role","status");document.body.appendChild(el)}
+  el.textContent=msg;el.classList.add("on");clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove("on"),5000);
+}
+
+// ---------- progress photos (stored on this device in IndexedDB) ----------
+let photoCount=0,photoList=[],photoUrls={};
+function pdb(){return new Promise((res,rej)=>{const r=indexedDB.open("road200-photos",1);r.onupgradeneeded=()=>r.result.createObjectStore("photos",{keyPath:"id"});r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
+async function ptx(mode,fn){const db=await pdb();return new Promise((res,rej)=>{const tx=db.transaction("photos",mode),st=tx.objectStore("photos");const out=fn(st);tx.oncomplete=()=>res(out&&out.result!==undefined?out.result:out);tx.onerror=()=>rej(tx.error)})}
+async function loadPhotos(){
+  try{const all=await ptx("readonly",st=>st.getAll());photoList=(all||[]).sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);photoCount=photoList.length;
+    for(const p of photoList)if(!photoUrls[p.id])photoUrls[p.id]=URL.createObjectURL(p.blob);
+  }catch(e){photoList=[];photoCount=0}
+}
+async function shrink(file){
+  const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=URL.createObjectURL(file)});
+  const s=Math.min(1,1280/Math.max(img.naturalWidth,img.naturalHeight)),c=document.createElement("canvas");
+  c.width=Math.round(img.naturalWidth*s);c.height=Math.round(img.naturalHeight*s);c.getContext("2d").drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(img.src);
+  return new Promise(res=>c.toBlob(b=>res(b),"image/jpeg",0.82));
+}
+async function addPhoto(file){
+  try{const blob=await shrink(file),a=currentAvg(),id=Date.now();
+    await ptx("readwrite",st=>st.put({id,date:todayIso(),weight:a!=null?r1(a):null,blob}));
+    await loadPhotos();checkMilestones();render();showToast("Photo saved on this phone.");
+  }catch(e){alert("Couldn't save that photo: "+errText(e))}
+}
+async function deletePhoto(id){await ptx("readwrite",st=>st.delete(id));if(photoUrls[id]){URL.revokeObjectURL(photoUrls[id]);delete photoUrls[id]}await loadPhotos();render()}
+let cmpA=null,cmpB=null;
+function photosHtml(){
+  const opts=sel=>photoList.map(p=>`<option value="${p.id}" ${p.id===sel?"selected":""}>${fmtDate(p.date)}${p.weight?` (${p.weight} lb)`:""}</option>`).join("");
+  if(photoList.length>=2){if(!photoList.some(p=>p.id===cmpA))cmpA=photoList[0].id;if(!photoList.some(p=>p.id===cmpB))cmpB=photoList[photoList.length-1].id}
+  const pa=photoList.find(p=>p.id===cmpA),pb=photoList.find(p=>p.id===cmpB);
+  return`<div class="block"><h2>Progress photos</h2>
+    <p class="foot" style="margin-top:0">Same spot, same lighting, once a month. Photos stay on this phone only and aren't included in backups.</p>
+    <div class="backup"><label class="filebtn">Add photo<input type="file" id="photoin" accept="image/*"></label></div>
+    ${photoList.length>=2?`<div class="compare">
+      <div><select id="cmpa" aria-label="Before photo">${opts(cmpA)}</select>${pa?`<img src="${photoUrls[pa.id]}" alt="Progress photo ${esc(pa.date)}">`:""}</div>
+      <div><select id="cmpb" aria-label="After photo">${opts(cmpB)}</select>${pb?`<img src="${photoUrls[pb.id]}" alt="Progress photo ${esc(pb.date)}">`:""}</div>
+    </div>`:""}
+    ${photoList.length?`<div class="thumbs">${photoList.slice().reverse().map(p=>`<figure><img src="${photoUrls[p.id]}" alt="Progress photo ${esc(p.date)}"><figcaption>${fmtDate(p.date)}${p.weight?`<br>${p.weight} lb`:""} <button type="button" class="link" data-pdel="${p.id}">Delete</button></figcaption></figure>`).join("")}</div>`:`<p class="empty">No photos yet.</p>`}
+  </div>`;
+}
+function bindWeightExtras(){
+  const pi=document.getElementById("photoin");if(pi)pi.addEventListener("change",ev=>{const f=ev.target.files&&ev.target.files[0];if(f)addPhoto(f);ev.target.value=""});
+  const a=document.getElementById("cmpa"),b=document.getElementById("cmpb");
+  if(a)a.addEventListener("change",()=>{cmpA=+a.value;render()});if(b)b.addEventListener("change",()=>{cmpB=+b.value;render()});
+  document.querySelectorAll("[data-pdel]").forEach(x=>x.addEventListener("click",()=>{if(confirm("Delete this photo?"))deletePhoto(+x.dataset.pdel)}));
+}
+function weightExtras(){return checkinHtml()+milestonesHtml()+photosHtml()}
+
+// ---------- guided workout ----------
+const WO_DEF={
+  A:[{n:"Chair squats",r:"10–15 reps"},{n:"Incline push-ups (counter)",r:"8–12 reps",push:10},{n:"Glute bridges",r:"15 reps"},{n:"Plank",r:"20–40 seconds",hold:30}],
+  B:[{n:"Reverse lunges",r:"8 per leg"},{n:"Table or doorframe rows",r:"10–12 reps"},{n:"Step-ups (stairs)",r:"10 per leg"},{n:"Dead bugs",r:"10 per side"}]
+};
+const WO_ROUNDS=3,WO_SHORT=20,WO_LONG=75;
+let wo=null,woTimer=null,audioCtx=null;
+function woSteps(type){const ex=WO_DEF[type],out=[];for(let r=1;r<=WO_ROUNDS;r++){ex.forEach((e,i)=>{out.push({kind:"ex",round:r,i,...e});const last=r===WO_ROUNDS&&i===ex.length-1;if(!last)out.push({kind:"rest",secs:i===ex.length-1?WO_LONG:WO_SHORT,next:i===ex.length-1?ex[0].n:ex[i+1].n})})}return out}
+function beep(){try{navigator.vibrate&&navigator.vibrate([200,100,200]);audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.frequency.value=880;g.gain.value=0.15;o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+0.35)}catch(e){}}
+function startWorkout(type){wo={type,steps:woSteps(type),i:0,started:Date.now(),push:[],endsAt:0,reps:WO_DEF[type].find(e=>e.push)?.push||0};keepAwake();woRender()}
+function woEnd(){clearInterval(woTimer);woTimer=null;const el=document.getElementById("wo");if(el)el.remove();wo=null;if(!state.track){try{wakeLock&&wakeLock.release()}catch(e){}wakeLock=null}}
+function woNext(){const s=wo.steps[wo.i];if(s&&s.kind==="ex"&&s.push)wo.push.push(wo.reps);wo.i++;const n=wo.steps[wo.i];if(n&&n.kind==="rest")wo.endsAt=Date.now()+n.secs*1000;if(n&&n.hold)wo.endsAt=0;woRender()}
+function woRender(){
+  let el=document.getElementById("wo");
+  if(!el){el=document.createElement("div");el.id="wo";el.setAttribute("role","dialog");el.setAttribute("aria-modal","true");el.setAttribute("aria-label","Guided workout");document.body.appendChild(el)}
+  clearInterval(woTimer);woTimer=null;
+  const s=wo.steps[wo.i],total=wo.steps.filter(x=>x.kind==="ex").length,done=wo.steps.slice(0,wo.i).filter(x=>x.kind==="ex").length;
+  const bar=`<div class="wobar"><i style="width:${Math.round(done/total*100)}%"></i></div>`;
+  if(!s){
+    const mins=Math.max(1,Math.round((Date.now()-wo.started)/60000)),push=wo.push.reduce((a,b)=>a+b,0);
+    el.innerHTML=`<div class="woin">${bar}<p class="wok">Strength ${wo.type} complete</p><h2>Nice work.</h2>
+      <p class="wobig">${mins} min</p><p>${push?`${push} push-ups in ${wo.push.length} sets will be added to today's push-up total.`:""}</p>
+      <div class="backup"><button type="button" id="wosave">Save workout</button><button type="button" class="quiet" id="woquit">Don't save</button></div></div>`;
+    el.querySelector("#wosave").onclick=()=>{
+      const t=todayIso(),e=Object.assign({},state.entries[t]||{});e.session=true;
+      if(push){const sets=(e.pushSets&&e.pushSets.length)?e.pushSets.slice():(num(e.pushups)?[num(e.pushups)]:[]);wo.push.forEach(x=>sets.push(x));e.pushSets=sets;e.pushups=sets.reduce((a,b)=>a+b,0)}
+      state.entries[t]=e;state.workouts.push({id:Date.now(),date:t,type:wo.type,minutes:mins,push});
+      woEnd();persist("Workout saved.");
+    };
+    el.querySelector("#woquit").onclick=()=>{if(confirm("Close without saving?"))woEnd()};
+    beep();return;
+  }
+  const quit=`<button type="button" class="link woquit" id="woquit">End workout</button>`;
+  if(s.kind==="rest"){
+    const tick=()=>{const left=Math.max(0,Math.ceil((wo.endsAt-Date.now())/1000));const t=el.querySelector("#wotime");if(t)t.textContent=left;if(left<=0){beep();woNext()}};
+    el.innerHTML=`<div class="woin">${bar}<p class="wok">Rest</p><p class="wobig" id="wotime" aria-live="polite">${s.secs}</p><p>Next: <strong>${esc(s.next)}</strong></p>
+      <div class="backup"><button type="button" class="quiet" id="woadd">+15 sec</button><button type="button" id="woskip">Skip rest</button></div>${quit}</div>`;
+    el.querySelector("#woadd").onclick=()=>{wo.endsAt+=15000;tick()};el.querySelector("#woskip").onclick=woNext;
+    woTimer=setInterval(tick,250);
+  }else{
+    el.innerHTML=`<div class="woin">${bar}<p class="wok">Strength ${wo.type}, round ${s.round} of ${WO_ROUNDS}</p><h2>${esc(s.n)}</h2><p class="wobig sm">${esc(s.r)}</p>
+      ${s.push?`<div class="wopush"><span>Reps done</span><span class="stepper"><button type="button" id="wom" aria-label="Fewer reps">−</button><b id="wor">${wo.reps}</b><button type="button" id="wop" aria-label="More reps">+</button></span></div>`:""}
+      ${s.hold?`<p><button type="button" class="quiet" id="wohold">${wo.endsAt?"":"Start "+s.hold+"-second timer"}</button></p>`:""}
+      <div class="backup"><button type="button" id="wodone">Done</button></div>${quit}</div>`;
+    if(s.push){el.querySelector("#wom").onclick=()=>{wo.reps=Math.max(0,wo.reps-1);el.querySelector("#wor").textContent=wo.reps};el.querySelector("#wop").onclick=()=>{wo.reps=Math.min(99,wo.reps+1);el.querySelector("#wor").textContent=wo.reps}}
+    if(s.hold){const hb=el.querySelector("#wohold");const tick=()=>{const left=Math.max(0,Math.ceil((wo.endsAt-Date.now())/1000));hb.textContent=left>0?left+" sec left":"Time! Tap Done";if(left<=0){clearInterval(woTimer);woTimer=null;beep()}};
+      hb.onclick=()=>{if(woTimer)return;wo.endsAt=Date.now()+s.hold*1000;tick();woTimer=setInterval(tick,250)}}
+    el.querySelector("#wodone").onclick=woNext;
+  }
+  el.querySelector("#woquit").onclick=()=>{if(confirm("End this workout? Nothing will be saved."))woEnd()};
+}
+function workoutButton(plan){
+  const m=plan.label.match(/Strength (A|B)/),last=state.workouts.filter(x=>x.date===todayIso()).length;
+  return`<div class="backup" style="margin-top:10px">${m?`<button type="button" data-wo="${m[1]}">Start guided Strength ${m[1]}</button>`:`<button type="button" class="quiet" data-wo="A">Guided Strength A</button><button type="button" class="quiet" data-wo="B">Guided Strength B</button>`}</div>${last?`<p class="foot">Guided workout done today ✓</p>`:""}`;
+}
+function bindRoutineExtras(){document.querySelectorAll("[data-wo]").forEach(b=>b.addEventListener("click",()=>startWorkout(b.dataset.wo)))}
+
+// ---------- disc golf stats + throw measuring ----------
+function golfStats(){
+  let fwN=0,fwY=0,putts=0,puttHoles=0;
+  for(const r of state.rounds)for(const h of (r.holesData||[])){if(h.fw===true||h.fw===false){fwN++;if(h.fw)fwY++}if(h.putts>0){putts+=h.putts;puttHoles++}}
+  const th=state.throws.slice().sort((a,b)=>b.id-a.id),last10=th.slice(0,10).map(t=>t.feet);
+  return{fw:fwN?Math.round(fwY/fwN*100):null,fwN,putt:putts?Math.round(puttHoles/putts*100):null,putts,puttHoles,avgPutts:puttHoles?r1(putts/puttHoles):null,
+    longest:th.length?Math.max(...th.map(t=>t.feet)):null,avg10:last10.length?Math.round(avg(last10)):null,th};
+}
+let gm={phase:"idle",tee:null,cur:null,acc:null,samples:[],watch:null,result:null};
+function gmStop(){if(gm.watch!=null)navigator.geolocation.clearWatch(gm.watch);gm.watch=null}
+function gmAvg(){const good=gm.samples.filter(s=>s.acc<=25);const use=good.length?good:gm.samples;if(!use.length)return null;
+  let w=0,la=0,lo=0;use.forEach(s=>{const k=1/Math.max(1,s.acc*s.acc);w+=k;la+=s.lat*k;lo+=s.lon*k});return{p:[la/w,lo/w],acc:Math.round(Math.min(...use.map(s=>s.acc)))}}
+function gmWatch(){
+  if(!("geolocation" in navigator)){alert("GPS isn't available here.");return false}
+  gmStop();gm.watch=navigator.geolocation.watchPosition(p=>{const c=p.coords;gm.acc=Math.round(c.accuracy);gm.cur=[c.latitude,c.longitude];gm.samples.push({lat:c.latitude,lon:c.longitude,acc:c.accuracy});if(gm.samples.length>12)gm.samples.shift();gmLive()},()=>{gm.acc=null;gmLive()},{enableHighAccuracy:true,maximumAge:0,timeout:30000});
+  keepAwake();return true;
+}
+function gmLive(){
+  const el=document.getElementById("gmlive");if(!el)return;
+  const acc=gm.acc==null?"Looking for GPS…":`GPS ±${gm.acc} m${gm.acc>15?" (wait for it to settle)":""}`;
+  if(gm.phase==="walk"&&gm.tee&&gm.cur)el.textContent=`${Math.round(hav(gm.tee.p,gm.cur)*3.28084)} ft from the tee. ${acc}`;else el.textContent=acc;
+}
+async function gmMark(which){
+  const btn=document.getElementById(which==="tee"?"gmtee":"gmdisc");if(btn){btn.disabled=true;btn.textContent="Hold still…"}
+  gm.samples=gm.samples.slice(-2);await new Promise(r=>setTimeout(r,4000));
+  const a=gmAvg();if(!a){alert("No GPS fix yet. Try again in a few seconds.");render();return}
+  if(which==="tee"){gm.tee=a;gm.phase="walk"}else{gm.result={feet:Math.round(hav(gm.tee.p,a.p)*3.28084),err:Math.round((gm.tee.acc+a.acc)*3.28084/2)};gm.phase="done";gmStop()}
+  render();
+}
+function golfExtras(){
+  const g=golfStats();
+  let meas;
+  if(gm.phase==="idle")meas=`<p>Stand on the tee and tap <strong>Mark tee</strong>. Throw, walk to your disc, then tap <strong>Mark disc</strong>.</p><div class="backup"><button type="button" id="gmstart">Mark tee</button></div>`;
+  else if(gm.phase==="tee")meas=`<p id="gmlive" class="foot">Looking for GPS…</p><div class="backup"><button type="button" id="gmtee">Mark tee here</button><button type="button" class="link" id="gmcancel">Cancel</button></div>`;
+  else if(gm.phase==="walk")meas=`<p>Tee marked. Throw, then walk to your disc.</p><p id="gmlive" class="foot"></p><div class="backup"><button type="button" id="gmdisc">Mark disc here</button><button type="button" class="link" id="gmcancel">Cancel</button></div>`;
+  else meas=`<p class="wobig" style="margin:0">${gm.result.feet} ft</p><p class="foot">Give or take about ${gm.result.err} ft (GPS).</p>
+    <div class="fields"><label>Disc (optional)<input type="text" id="gmdiscname" maxlength="40" list="disclist"></label><label>Course<input type="text" id="gmcourse" list="courselist" maxlength="60" value="${esc(courses()[0]||"")}"></label></div>
+    <datalist id="disclist">${[...new Set(state.throws.map(t=>t.disc).filter(Boolean))].map(d=>`<option value="${esc(d)}">`).join("")}</datalist>
+    <div class="backup"><button type="button" id="gmsave">Save throw</button><button type="button" class="quiet" id="gmcancel">Discard</button></div>`;
+  return`<div class="grid" style="margin-top:44px">
+    <section class="plan">
+      <h2>Measure a throw</h2>${meas}
+      <p class="foot">Keep the app open while measuring. GPS is usually good to about 10–30 feet, so measure drives rather than putts.</p>
+    </section>
+    <section>
+      <h2>Your stats</h2>
+      <div class="targets" style="grid-template-columns:repeat(3,1fr)">
+        <div><b>${g.fw!=null?g.fw+"%":"–"}</b>fairways hit${g.fwN?` (${g.fwN})`:""}</div>
+        <div><b>${g.putt!=null?g.putt+"%":"–"}</b>circle 1 putting</div>
+        <div><b>${g.avgPutts!=null?g.avgPutts:"–"}</b>putts per hole</div>
+        <div><b>${g.longest!=null?g.longest+" ft":"–"}</b>longest throw</div>
+        <div><b>${g.avg10!=null?g.avg10+" ft":"–"}</b>avg last 10</div>
+        <div><b>${g.th.length}</b>throws measured</div>
+      </div>
+      <p class="foot">Fairway and putting stats come from the Fairway and C1 putts buttons on the scorecard. C1 putting assumes your last putt on each hole went in.</p>
+      ${g.th.length?`<div class="tablewrap"><table><thead><tr><th>Day</th><th>Distance</th><th>Disc</th><th>Course</th><th></th></tr></thead>
+      <tbody>${g.th.slice(0,15).map(t=>`<tr><td>${fmtDate(t.date)}</td><td>${t.feet} ft</td><td>${esc(t.disc||"–")}</td><td>${esc(t.course||"–")}</td><td><button type="button" class="link" data-tdel="${t.id}">Delete</button></td></tr>`).join("")}</tbody></table></div>`:""}
+    </section>
+  </div>`;
+}
+function bindGolfExtras(){
+  const on=(id,f)=>{const el=document.getElementById(id);if(el)el.addEventListener("click",f)};
+  on("gmstart",()=>{if(gmWatch()){gm.phase="tee";gm.samples=[];render()}});
+  on("gmtee",()=>gmMark("tee"));on("gmdisc",()=>gmMark("disc"));
+  on("gmcancel",()=>{gmStop();gm={phase:"idle",tee:null,cur:null,acc:null,samples:[],watch:null,result:null};render()});
+  on("gmsave",()=>{const d=document.getElementById("gmdiscname").value.trim(),c=document.getElementById("gmcourse").value.trim();
+    state.throws.push({id:Date.now(),date:todayIso(),feet:gm.result.feet,disc:d||undefined,course:c||undefined});gm={phase:"idle",tee:null,cur:null,acc:null,samples:[],watch:null,result:null};persist("Throw saved.")});
+  document.querySelectorAll("[data-tdel]").forEach(b=>b.addEventListener("click",()=>{if(confirm("Delete this throw?")){state.throws=state.throws.filter(t=>String(t.id)!==b.dataset.tdel);persist("Throw deleted.")}}));
+  document.querySelectorAll("[data-fw]").forEach(b=>b.addEventListener("click",()=>{const h=state.draft&&state.draft.holes[+b.dataset.fw];if(!h)return;h.fw=h.fw===true?false:h.fw===false?null:true;saveQuiet()}));
+  document.querySelectorAll("[data-pt]").forEach(b=>b.addEventListener("click",()=>{const h=state.draft&&state.draft.holes[+b.dataset.pt];if(!h)return;h.putts=Math.max(0,Math.min(6,(h.putts||0)+(+b.dataset.d)));saveQuiet()}));
+  gmLive();
+}
+function holeExtras(h,i){
+  if(!h.s)return"";
+  const fw=h.fw===true?"Hit":h.fw===false?"Missed":"–";
+  return`<div class="hole-x"><span>Fairway <button type="button" class="chip ${h.fw===true?"yes":h.fw===false?"no":""}" data-fw="${i}" aria-label="Hole ${i+1} fairway: ${fw}. Tap to change">${fw}</button></span>
+    <span>C1 putts <span class="stepper sm"><button type="button" data-pt="${i}" data-d="-1" aria-label="Hole ${i+1} fewer putts">−</button><b>${h.putts||0}</b><button type="button" data-pt="${i}" data-d="1" aria-label="Hole ${i+1} more putts">+</button></span></span></div>`;
+}
+
+// ---------- reminders + home-screen widget (Android app) ----------
+const REMIND_DEF={weighOn:true,weigh:"07:00",pushOn:true,push:["10:00","13:00","16:00"],stepsOn:true,steps:"19:00"};
+function remind(){return Object.assign({},REMIND_DEF,state.settings.remind||{})}
+let syncT=null;
+function nativeSync(){
+  if(!SC)return;clearTimeout(syncT);
+  syncT=setTimeout(()=>{
+    const t=todayIso(),w=Math.max(1,weekOf(t)),e=state.entries[t]||{};
+    const payload={date:t,weighed:num(e.weight)!=null,pushups:pushTotal(e)||0,pushTarget:pushTarget(w),steps:dayStepsTotal(t)||0,stepTarget:stepsTarget(w),
+      calories:num(e.calories)!=null?Math.round(num(e.calories)):-1,calorieTarget:state.settings.calories,protein:num(e.protein)!=null?Math.round(num(e.protein)):-1,proteinTarget:state.settings.protein,remind:remind()};
+    try{SC.syncState(payload).catch(()=>{})}catch(err){}
+  },400);
+}
+function remindersHtml(){
+  if(!SC)return"";
+  const r=remind();
+  return`<h3>Reminders</h3>
+  <form id="remform" style="border:0;padding:0;margin:0">
+    <div class="checks" style="flex-direction:column;align-items:flex-start;gap:12px">
+      <label><input type="checkbox" name="weighOn" ${r.weighOn?"checked":""}>Morning weigh-in at <input type="time" name="weigh" value="${r.weigh}" class="tm"></label>
+      <label><input type="checkbox" name="pushOn" ${r.pushOn?"checked":""}>Push-up nudges at <input type="time" name="p0" value="${r.push[0]||""}" class="tm"><input type="time" name="p1" value="${r.push[1]||""}" class="tm"><input type="time" name="p2" value="${r.push[2]||""}" class="tm"></label>
+      <label><input type="checkbox" name="stepsOn" ${r.stepsOn?"checked":""}>Evening step check at <input type="time" name="steps" value="${r.steps}" class="tm"></label>
+    </div>
+    <button type="submit" class="quiet">Save reminders</button>
+    <p class="foot">Reminders only go off when you still need them: no weigh-in logged yet, push-ups under today's target, or steps under today's target.</p>
+  </form>
+  <h3>Home-screen widget</h3>
+  <p class="foot" style="margin-top:0">Long-press your home screen, tap Widgets, find Road to 200, and drag it out. It shows today's steps, push-ups and calories left.</p>`;
+}
+function bindReminders(){
+  const f=document.getElementById("remform");if(!f)return;
+  f.addEventListener("submit",async ev=>{ev.preventDefault();const E=f.elements;
+    const r={weighOn:E.weighOn.checked,weigh:E.weigh.value||"07:00",pushOn:E.pushOn.checked,push:[E.p0.value,E.p1.value,E.p2.value].filter(Boolean),stepsOn:E.stepsOn.checked,steps:E.steps.value||"19:00"};
+    state.settings=Object.assign({},state.settings,{remind:r});
+    if(r.weighOn||r.pushOn||r.stepsOn){try{await SC.requestNotifications()}catch(e){}}
+    persist("Reminders saved.");
+  });
+}
+
 // ---------- saving ----------
 function persist(msg){
   state.savedAt=Date.now();
   let ok=true;
   try{localStorage.setItem(LS,JSON.stringify(state))}catch(e){ok=false}
-  render();say(ok?msg:"Couldn't save. Your phone's storage may be full or blocked for this app.");
+  checkMilestones();render();nativeSync();say(ok?msg:"Couldn't save. Your phone's storage may be full or blocked for this app.");
 }
 function backupName(){return "road-to-200-backup-"+todayIso()+".json"}
 async function exportData(){
@@ -956,6 +1318,8 @@ let rzT=null,lastW=window.innerWidth;window.addEventListener("resize",()=>{if(Ma
 handleImport();
 if(state.track&&!state.track.paused){state.track.route.push([]);startWatch()}
 render();
+loadPhotos().then(()=>{checkMilestones();if(photoCount)quietRender()});
+nativeSync();
 updateLive();
 })();
 </script>

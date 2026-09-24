@@ -17,6 +17,8 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 import com.getcapacitor.annotation.Permission;
 import com.getcapacitor.annotation.PermissionCallback;
 
+import org.json.JSONObject;
+
 /** JavaScript bridge: window.Capacitor.registerPlugin("StepCounter") */
 @CapacitorPlugin(
     name = "StepCounter",
@@ -98,6 +100,36 @@ public class StepCounterPlugin extends Plugin {
         StepStore.setEnabled(getContext(), false);
         getContext().stopService(new Intent(getContext(), StepCounterService.class));
         resolveStatus(call);
+    }
+
+    /** Receives today's numbers and reminder settings from the app; reschedules reminders and refreshes the widget. */
+    @PluginMethod
+    public void syncState(PluginCall call) {
+        try {
+            JSONObject data = new JSONObject(call.getData().toString());
+            ReminderScheduler.saveState(getContext(), data);
+            ReminderScheduler.scheduleNext(getContext());
+            RoadWidgetProvider.updateAll(getContext());
+            call.resolve();
+        } catch (Exception e) {
+            call.reject("Couldn't sync: " + e.getMessage());
+        }
+    }
+
+    /** Asks for notification permission (Android 13+) so reminders can show. */
+    @PluginMethod
+    public void requestNotifications(PluginCall call) {
+        if (Build.VERSION.SDK_INT < 33 || getPermissionState("notifications") == PermissionState.GRANTED) {
+            JSObject r = new JSObject(); r.put("granted", true); call.resolve(r); return;
+        }
+        requestPermissionForAlias("notifications", call, "afterNotifications");
+    }
+
+    @PermissionCallback
+    private void afterNotifications(PluginCall call) {
+        JSObject r = new JSObject();
+        r.put("granted", Build.VERSION.SDK_INT < 33 || getPermissionState("notifications") == PermissionState.GRANTED);
+        call.resolve(r);
     }
 
     /** Opens this app's page in Android settings (permissions, battery). */

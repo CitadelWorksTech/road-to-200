@@ -1,5 +1,5 @@
 // Road to 200 service worker: works offline after the first visit.
-const CACHE = "road200-v6";
+const CACHE = "road200-v7";
 const SHELL = ["./", "index.html", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png", "icons/apple-touch-icon.png", "capacitor.js"];
 
 self.addEventListener("install", e => {

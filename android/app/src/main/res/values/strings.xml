@@ -4,4 +4,5 @@
     <string name="title_activity_main">Road to 200</string>
     <string name="package_name">tech.citadelworks.roadto200</string>
     <string name="custom_url_scheme">tech.citadelworks.roadto200</string>
+    <string name="widget_description">Today\'s steps, push-ups and calories left</string>
 </resources>

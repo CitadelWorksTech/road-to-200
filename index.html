@@ -1577,7 +1577,7 @@ function render(){
   const where=w<1?`Starts ${fmtDate(S.startDate)}`:w>S.weeks?`Week ${w}, past the ${S.weeks}-week plan`:`Week ${w} of ${S.weeks}, ${phase(w)} phase`;
   const trAct=state.track?(state.track.act||"steps"):null,onTrack=tab==="activity"&&act===trAct;
   let panel;
-  if(tab==="weight")panel=weightPanel()+checkinHtml()+goalsSection("weight","Weight goals & milestones")+photosHtml();
+  if(tab==="weight")panel=weightPanel()+checkinHtml()+photosHtml()+goalsSection("weight","Weight goals & milestones");
   else if(tab==="food")panel=foodPanel()+goalsSection("food","Food goals & milestones");
   else if(tab==="workout")panel=routinePanel()+moodInsights()+goalsSection("workout","Workout goals & milestones");
   else panel=activityPanel();

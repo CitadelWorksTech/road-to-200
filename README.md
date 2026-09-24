@@ -10,16 +10,26 @@ Forgeway (formerly Road to 200): a weight, food, workout, steps and disc golf tr
 All data stays on the phone. Use **Plan settings → Export backup** regularly.
 
 ## Repository layout
-- `index.html`, `capacitor.js`, `manifest.webmanifest`, `sw.js`, `icons/`: the app. GitHub Pages serves these.
-- `android/`: the Android wrapper (Capacitor), including the step counter in
-  `android/app/src/main/java/tech/citadelworks/roadto200/`.
-- `.github/workflows/build-apk.yml`: builds a signed APK and publishes it as a Release on every change to the app.
+| Path | What it is |
+|---|---|
+| `index.html` | App shell: loads the stylesheet and scripts |
+| `css/app.css` | All styles |
+| `js/*.js` | The app, split by feature. Scripts share one global scope and load in the order listed in `index.html`: `core` → `charts` → `panels` → `golf` → `steps` → `native` → `progress` → `workout` → `goals` → `activity` → `settings` → `food` → `share` → `app` |
+| `tests/` | Automated tests (Node's built-in test runner + jsdom) that load the real app, with a simulated Android bridge |
+| `android/` | Android wrapper (Capacitor) with native step counter, background GPS, reminders and widget in `android/app/src/main/java/tech/citadelworks/roadto200/` |
+| `.github/workflows/build-apk.yml` | Runs the tests, then builds a signed APK and Play Store bundle on every change |
+
+## Developing
+```
+npm ci
+npm test
+```
+Tests must pass before GitHub builds the app.
 
 ## Updating
-Edit `index.html`, commit, push. Pages updates the web app. Actions builds a new APK release.
-For the web app, also bump `CACHE` in `sw.js` (`road200-v6`, `v7`, …) so installed copies refresh.
+Edit files in `js/` or `css/`, commit, push. Pages updates the web app; Actions tests and builds a new release.
+For the web app, also bump `CACHE` in `sw.js` so installed copies refresh.
 
 ## Signing key
 The APK signing key is **not** in this repo. It lives in two repository secrets:
-`KEYSTORE_BASE64` and `KEYSTORE_PASSWORD`. Keep a private copy of the keystore file. Every APK must be
-signed with the same key, or Android won't install updates over the old version.
+`KEYSTORE_BASE64` and `KEYSTORE_PASSWORD`. Keep a private copy of the keystore file.

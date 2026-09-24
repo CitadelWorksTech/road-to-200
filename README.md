@@ -14,7 +14,7 @@ All data stays on the phone. Use **Plan settings → Export backup** regularly.
 |---|---|
 | `index.html` | App shell: loads the stylesheet and scripts |
 | `css/app.css` | All styles |
-| `js/*.js` | The app, split by feature. Scripts share one global scope and load in the order listed in `index.html`: `core` → `charts` → `panels` → `golf` → `steps` → `native` → `progress` → `workout` → `goals` → `activity` → `settings` → `food` → `share` → `app` |
+| `js/*.js` | The app, split by feature. Scripts share one global scope and load in the order listed in `index.html`: `core` → `charts` → `panels` → `golf` → `steps` → `native` → `progress` → `workout` → `goals` → `activity` → `settings` → `food` → `share` → `inbox` → `app` |
 | `tests/` | Automated tests (Node's built-in test runner + jsdom) that load the real app, with a simulated Android bridge |
 | `android/` | Android wrapper (Capacitor) with native step counter, background GPS, reminders and widget in `android/app/src/main/java/tech/citadelworks/roadto200/` |
 | `.github/workflows/build-apk.yml` | Runs the tests, then builds a signed APK and Play Store bundle on every change |

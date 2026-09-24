@@ -196,3 +196,47 @@ test('Android: background GPS hike saves as an activity session', async () => {
   assert.equal(s.route.length, 2, 'two GPS segments');
   a.close();
 });
+
+test('notifications: existing history does not flood the inbox on first open', async () => {
+  const a = await openApp({ state: sampleState(10) });
+  await wait(100);
+  assert.equal(a.$('#bellcount').hidden, true);
+  assert.equal(a.$('#openinbox').getAttribute('aria-label'), 'Notifications');
+  a.close();
+});
+
+test('notifications: a new milestone shows an unread badge, and opening the inbox clears it', async () => {
+  const a = await openApp();
+  await wait(100);
+  const f = a.$('#wlog');
+  f.elements.weight.value = '284.2';
+  a.submit(f);
+  assert.equal(a.$('#bellcount').hidden, false);
+  assert.ok(Number(a.$('#bellcount').textContent) >= 1);
+  a.$('#openinbox').click();
+  assert.match(a.text('#gw .inbox'), /First weigh-in/);
+  assert.ok(a.$('#gw .note-item.unread'), 'new items are highlighted');
+  assert.equal(a.$('#bellcount').hidden, true);
+  assert.ok(a.saved().inbox.items.every(n => n.read));
+  a.close();
+});
+
+test('notifications: filter by type and tap to jump to the right tab', async () => {
+  const a = await openApp({ tab: 'workout' });
+  await wait(100);
+  a.$('[data-wo]').click();
+  for (let i = 0; i < 40 && a.$('#wo'); i++) {
+    if (a.$('#wosave')) { a.$('#wosave').click(); break; }
+    if (a.$('#woskip')) a.$('#woskip').click(); else a.$('#wodone').click();
+  }
+  a.$('[data-tab="weight"]').click();
+  a.$('#openinbox').click();
+  a.$('[data-ifilter="workout"]').click();
+  const titles = [...a.doc.querySelectorAll('#gw .ni-text b')].map(b => b.textContent);
+  assert.ok(titles.some(t => /Guided Strength/.test(t)));
+  assert.ok(titles.every(t => !/weigh-in/i.test(t)));
+  a.$('#gw [data-inote]').click();
+  await wait(120);
+  assert.equal(a.$('[role=tab][aria-selected="true"]').textContent.trim(), 'Workout');
+  a.close();
+});

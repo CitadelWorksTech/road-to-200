@@ -10,7 +10,7 @@ const STR_B=["Reverse lunges, 8 per leg","Table or doorframe rows, 10–12","Ste
 
 function norm(s){
   s=s&&typeof s==="object"?s:{};
-  return {settings:Object.assign({},DEF.settings,s.settings||{}),entries:Object.assign({},s.entries||{}),rounds:Array.isArray(s.rounds)?s.rounds:[],draft:s.draft&&Array.isArray(s.draft.holes)?s.draft:null,walks:Array.isArray(s.walks)?s.walks:[],track:s.track&&Array.isArray(s.track.route)?s.track:null,workouts:Array.isArray(s.workouts)?s.workouts:[],throws:Array.isArray(s.throws)?s.throws:[],milestones:s.milestones&&typeof s.milestones==="object"?s.milestones:{},goals:Array.isArray(s.goals)?s.goals:[],sessions:Array.isArray(s.sessions)?s.sessions:[],acts:s.acts&&typeof s.acts==="object"?s.acts:{list:["steps","golf"],custom:[]},foods:s.foods&&typeof s.foods==="object"?s.foods:{saved:[],log:{},scans:0},savedAt:s.savedAt||0};
+  return {settings:Object.assign({},DEF.settings,s.settings||{}),entries:Object.assign({},s.entries||{}),rounds:Array.isArray(s.rounds)?s.rounds:[],draft:s.draft&&Array.isArray(s.draft.holes)?s.draft:null,walks:Array.isArray(s.walks)?s.walks:[],track:s.track&&Array.isArray(s.track.route)?s.track:null,workouts:Array.isArray(s.workouts)?s.workouts:[],throws:Array.isArray(s.throws)?s.throws:[],milestones:s.milestones&&typeof s.milestones==="object"?s.milestones:{},goals:Array.isArray(s.goals)?s.goals:[],sessions:Array.isArray(s.sessions)?s.sessions:[],acts:s.acts&&typeof s.acts==="object"?s.acts:{list:["steps","golf"],custom:[]},foods:s.foods&&typeof s.foods==="object"?s.foods:{saved:[],log:{},scans:0},inbox:s.inbox&&typeof s.inbox==="object"?s.inbox:{items:[],keys:[],init:false},savedAt:s.savedAt||0};
 }
 function load(){
   let s=null;

@@ -17,7 +17,7 @@ function render(){
   else if(tab==="workout")panel=routinePanel()+moodInsights()+goalsSection("workout","Workout goals & milestones");
   else panel=activityPanel();
   app.innerHTML=`
-  <div class="top"><div><h1>${esc(S.headline||"Road to 200")}</h1><div class="where">${S.name?esc(S.name)+", ":""}${where}</div></div><button type="button" class="gear" id="opensettings" aria-label="Settings">${GEAR}</button></div>
+  <div class="top"><div><h1>${esc(S.headline||"Road to 200")}</h1><div class="where">${S.name?esc(S.name)+", ":""}${where}</div></div><div class="topbtns">${bellHtml()}<button type="button" class="gear" id="opensettings" aria-label="Settings">${GEAR}</button></div></div>
   <div class="tabs" role="tablist" aria-label="Tracker areas">
     <button role="tab" id="tab-weight" aria-selected="${tab==="weight"}" aria-controls="panel" data-tab="weight">Weight</button>
     <button role="tab" id="tab-food" aria-selected="${tab==="food"}" aria-controls="panel" data-tab="food">Food</button>
@@ -32,6 +32,7 @@ function bind(){
   if(state.track)setTimeout(updateLive,0);
   if(view==="settings"){bindSettingsPage();return}
   document.getElementById("opensettings").addEventListener("click",openSettings);
+  document.getElementById("openinbox").addEventListener("click",openInbox);
   const order=["weight","food","workout","activity"];
   document.querySelectorAll("[data-tab]").forEach(b=>{
     b.addEventListener("click",()=>setTab(b.dataset.tab));
@@ -80,7 +81,7 @@ function persist(msg){
   state.savedAt=Date.now();
   let ok=true;
   try{localStorage.setItem(LS,JSON.stringify(state))}catch(e){ok=false}
-  checkMilestones();checkGoals();render();nativeSync();autoBackup();say(ok?msg:"Couldn't save. Your phone's storage may be full or blocked for this app.");
+  checkMilestones();checkGoals();updateInbox();render();nativeSync();autoBackup();say(ok?msg:"Couldn't save. Your phone's storage may be full or blocked for this app.");
 }
 function backupName(){return "forgeway-backup-"+todayIso()+".json"}
 async function exportData(){
@@ -117,7 +118,7 @@ handleImport();
 if(state.track&&state.track.native){if(GT)gtStartPolling();else{state.track.paused=true}}
 else if(state.track&&!state.track.paused){state.track.route.push([]);startWatch()}
 render();
-loadPhotos().then(()=>{checkMilestones();checkGoals();quietRender()});
+loadPhotos().then(()=>{checkMilestones();checkGoals();updateInbox();quietRender()});
 nativeSync();
 checkRestore();
 updateLive();

@@ -1,7 +1,7 @@
 // Forgeway service worker: works offline after the first visit.
-const CACHE = "road200-v12";
+const CACHE = "road200-v13";
 const SHELL = ["./", "index.html", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png", "icons/apple-touch-icon.png", "capacitor.js", "css/app.css",
-  ...["core","charts","panels","golf","steps","native","progress","workout","goals","activity","settings","food","share","app"].map(n => `js/${n}.js`)];
+  ...["core","charts","panels","golf","steps","native","progress","workout","goals","activity","settings","food","share","inbox","app"].map(n => `js/${n}.js`)];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));

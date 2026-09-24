@@ -227,3 +227,19 @@ summary{font-family:var(--cond);font-size:22px;font-weight:600;cursor:pointer}
 .filebtn:focus-within{outline:3px solid var(--route);outline-offset:2px}
 .foot{color:var(--muted);font-size:14px;margin-top:10px}
 @media (prefers-reduced-motion:no-preference){ .avgline{stroke-dasharray:2000;stroke-dashoffset:2000;animation:draw 1.2s ease-out .15s forwards} @keyframes draw{to{stroke-dashoffset:0}} }
+
+.topbtns{display:flex;gap:10px;flex:0 0 auto}
+.bell{position:relative}
+.badge{position:absolute;top:-4px;right:-4px;min-width:22px;height:22px;padding:0 6px;box-sizing:border-box;border-radius:11px;background:#C2410C;color:#fff;font:700 12px/22px var(--body);text-align:center;border:2px solid var(--paper)}
+.badge[hidden]{display:none}
+.inbox{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:8px}
+.note-item{display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;background:var(--field);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:12px 14px;min-height:0;font-weight:400}
+.note-item.unread{border-color:var(--route);background:var(--route-soft)}
+.ni-icon{font-size:24px;line-height:1.2}
+.ni-text{flex:1;display:flex;flex-direction:column;gap:2px}
+.ni-text b{font-size:16px;font-weight:600}
+.ni-text small{font-size:14px;color:var(--muted)}
+.ni-meta{font-size:12px!important;margin-top:2px}
+.ni-dot{width:10px;height:10px;border-radius:50%;background:#C2410C;flex:0 0 auto;margin-top:6px}
+.subnav .chip small{color:var(--muted);font-weight:500;margin-left:2px}
+.subnav .chip.on small{color:inherit;opacity:.75}

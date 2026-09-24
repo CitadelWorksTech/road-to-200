@@ -24,7 +24,7 @@ function quietRender(){const a=document.activeElement;if(a&&/INPUT|SELECT|TEXTAR
 async function scRefresh(){
   if(!SC)return;
   try{applySteps(await SC.getDays());sc.error=""}catch(e){sc.checked=true;sc.error=errText(e)}
-  checkMilestones();checkGoals();quietRender();nativeSync();
+  checkMilestones();checkGoals();updateInbox();quietRender();nativeSync();
 }
 async function scStart(){
   if(!SC||sc.busy)return;sc.busy=true;render();

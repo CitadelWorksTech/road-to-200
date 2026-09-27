@@ -36,11 +36,27 @@ function parseSets(v){return String(v||"").split(/[^0-9]+/).map(Number).filter(n
 function pushTotal(e){if(!e)return null;if(e.pushSets&&e.pushSets.length)return e.pushSets.reduce((a,b)=>a+b,0);return num(e.pushups)}
 function pushHit(d){const t=pushTotal(state.entries[d]);return t!=null&&t>=pushTarget(weekOf(d))}
 function pushStreak(){let n=dn(todayIso());if(!pushHit(iso(n)))n--;let c=0;while(pushHit(iso(n))){c++;n--}return c}
+// ---------- fight program ----------
+// 5-week home prep (Tue + Sun rounds), then Muay Thai classes Tue/Sun, then BJJ on Mondays.
+const FIGHT={prepStart:"2026-09-28",classStart:"2026-11-03",bjjStart:"2027-01-04",rest:60,
+  weeks:[{r:3,m:2},{r:4,m:2},{r:4,m:3},{r:5,m:3},{r:5,m:3,test:1}]};
+function fightPrep(date,dow){
+  const n=dn(date)-dn(FIGHT.prepStart);if(n<0||n>=35)return null;
+  const wi=Math.floor(n/7),w=FIGHT.weeks[wi];
+  if(w.test&&dow===0)return{week:wi+1,rounds:3,mins:2,easy:true};
+  return{week:wi+1,rounds:w.r,mins:w.m,test:!!(w.test&&dow===2)};
+}
 function isHoliday(date){const md=date.slice(5);return md>="11-23"||md<="01-02"}
 function dayPlan(date){
   const w=Math.max(1,weekOf(date));const dow=new Date(dn(date)*864e5).getUTCDay();
   const odd=w%2===1;
   const A={label:"Strength A + walk",moves:STR_A},B={label:"Strength B + walk",moves:STR_B};
+  if(dow===2||dow===0){
+    const f=fightPrep(date,dow);
+    if(f)return{label:(f.test?"Fight prep test: ":f.easy?"Easy fight prep: ":"Fight prep: ")+`${f.rounds} × ${f.mins}-min rounds`+(dow===2?" + walk":""),moves:[],fight:f};
+    if(date>=FIGHT.classStart)return{label:dow===2?"Muay Thai class, 6:15 PM":"Muay Thai class, 12:30 PM",moves:[],cls:{type:"MT",name:"Muay Thai class",mins:dow===2?75:60}};
+  }
+  if(dow===1&&date>=FIGHT.bjjStart)return{label:"BJJ gi class, 6:00 PM",moves:[],cls:{type:"BJJ",name:"BJJ class",mins:120}};
   switch(dow){
     case 1:return odd?A:B;
     case 3:return odd?B:A;

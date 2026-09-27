@@ -59,8 +59,9 @@ function inboxCandidates() {
   // Workout
   const plan = dayPlan(t), m = plan.label.match(/Strength (A|B)/);
   if (m && hour >= 16 && !e.session) out.push([`wo-plan-${t}`, 'workout', `Strength ${m[1]} is on today's plan`, 'Start a guided workout from the Workout tab. It takes about 20 minutes.', { tab: 'workout' }]);
+  if (plan.fight && hour >= 16 && !e.session) out.push([`fp-plan-${t}`, 'workout', 'Fight prep rounds are on today\'s plan', `${plan.fight.rounds} rounds of ${plan.fight.mins} minutes. Start them from the Workout tab.`, { tab: 'workout' }]);
   if (pushHit(t)) out.push([`push-hit-${t}`, 'workout', `Push-up target hit: ${pushTotal(e)}`, `That's ${pushStreak()} day${pushStreak() === 1 ? '' : 's'} in a row on target.`, { tab: 'workout' }]);
-  for (const x of state.workouts) out.push([`wo-${x.id}`, 'workout', `Guided Strength ${x.type} done`, `${x.minutes} min${x.push ? `, ${x.push} push-ups` : ''}${x.mood ? ` ${x.mood}` : ''}.`, { tab: 'workout' }]);
+  for (const x of state.workouts) out.push([`wo-${x.id}`, 'workout', `${woName(x)} done`, `${x.minutes} min${x.push ? `, ${x.push} push-ups` : ''}${x.mood ? ` ${x.mood}` : ''}.`, { tab: 'workout' }]);
 
   // Steps
   const st = dayStepsTotal(t) || 0, tg = stepsTarget(w);

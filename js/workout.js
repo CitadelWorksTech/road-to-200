@@ -43,7 +43,7 @@ function woRender(){
     el.querySelector("#woadd").onclick=()=>{wo.endsAt+=15000;tick()};el.querySelector("#woskip").onclick=woNext;
     woTimer=setInterval(tick,250);
   }else{
-    el.innerHTML=`<div class="woin">${bar}<p class="wok">Strength ${wo.type}, round ${s.round} of ${WO_ROUNDS}</p><h2>${esc(s.n)}</h2><p class="wobig sm">${esc(s.r)}</p>
+    el.innerHTML=`<div class="woin">${bar}<p class="wok">Strength ${wo.type}, round ${s.round} of ${WO_ROUNDS}</p><h2>${esc(s.n)}</h2><p class="wobig sm">${esc(s.r)}</p>${vidLink(s.n,"Watch how to do it")}
       ${s.push?`<div class="wopush"><span>Reps done</span><span class="stepper"><button type="button" id="wom" aria-label="Fewer reps">−</button><b id="wor">${wo.reps}</b><button type="button" id="wop" aria-label="More reps">+</button></span></div>`:""}
       ${s.hold?`<p><button type="button" class="quiet" id="wohold">${wo.endsAt?"":"Start "+s.hold+"-second timer"}</button></p>`:""}
       <div class="backup"><button type="button" id="wodone">Done</button></div>${quit}</div>`;
@@ -55,7 +55,9 @@ function woRender(){
   el.querySelector("#woquit").onclick=()=>{if(confirm("End this workout? Nothing will be saved."))woEnd()};
 }
 function workoutButton(plan){
+  if(plan.fight)return fightButton(plan);
+  if(plan.cls)return classButton(plan);
   const m=plan.label.match(/Strength (A|B)/),last=state.workouts.filter(x=>x.date===todayIso()).length;
   return`<div class="backup" style="margin-top:10px">${m?`<button type="button" data-wo="${m[1]}">Start guided Strength ${m[1]}</button>`:`<button type="button" class="quiet" data-wo="A">Guided Strength A</button><button type="button" class="quiet" data-wo="B">Guided Strength B</button>`}</div>${last?`<p class="foot">Guided workout done today ✓</p>`:""}`;
 }
-function bindRoutineExtras(){document.querySelectorAll("[data-wo]").forEach(b=>b.addEventListener("click",()=>startWorkout(b.dataset.wo)))}
+function bindRoutineExtras(){document.querySelectorAll("[data-wo]").forEach(b=>b.addEventListener("click",()=>startWorkout(b.dataset.wo)));bindFightExtras()}

@@ -28,8 +28,9 @@ const daysAgo = n => { const d = new Date(); d.setDate(d.getDate() - n); return 
  *   tab    – starting tab
  *   native – true to simulate the Android app (StepCounter, Filesystem, Share, GpsTracker plugins)
  *   fetch  – replacement for window.fetch
+ *   now    – fake local clock start, e.g. '2026-09-29T18:00:00'
  */
-async function openApp({ state, tab, native = false, fetch } = {}) {
+async function openApp({ state, tab, native = false, fetch, now } = {}) {
   const calls = [];
   const dom = await JSDOM.fromFile(path.join(ROOT, 'index.html'), {
     url: 'https://localhost/',
@@ -38,6 +39,11 @@ async function openApp({ state, tab, native = false, fetch } = {}) {
     pretendToBeVisual: true,
     beforeParse(w) {
       w.scrollTo = () => {};
+      if (now) {
+        const RD = w.Date, t0 = new RD(now).getTime(), real0 = RD.now();
+        const clock = () => t0 + (RD.now() - real0);
+        w.Date = class extends RD { constructor(...a) { if (a.length) super(...a); else super(clock()); } static now() { return clock(); } };
+      }
       w.confirm = () => true;
       w.alert = () => {};
       w.prompt = () => null;

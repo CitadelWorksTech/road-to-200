@@ -73,7 +73,7 @@ function routinePanel(){
       <div class="daily"><p><strong>Every day: ${pushTarget(wd)} push-ups</strong>, split into 3–4 sets through the day.</p><p>Stop each set 2–3 reps short of failure. Start with hands on a counter and lower the surface once all sets feel easy.${plan.label.startsWith("Strength A")?" Today's circuit push-ups count toward the total.":""}</p><p>${tt!=null?"Today so far: "+tt+" of "+pushTarget(wd)+(tt>=pushTarget(wd)?" ✓. ":". "):""}${st?"Streak: "+st+" day"+(st>1?"s":"")+" on target.":"No streak yet. Hit today's target to start one."}</p></div>
       <p class="today">${esc(plan.label)}</p>
       ${workoutButton(plan)}
-      ${plan.moves.length?`<ul class="moves">${plan.moves.map(m=>`<li>${m}</li>`).join("")}</ul><p class="foot">3 rounds, 60–90 sec rest. When every round hits the top of the range, make it harder.</p>`:""}
+      ${plan.moves.length?`<ul class="moves">${plan.moves.map(m=>`<li>${esc(m)} ${vidLink(m.split(",")[0],"Watch")}</li>`).join("")}</ul><p class="foot">3 rounds, 60–90 sec rest. When every round hits the top of the range, make it harder.</p>`:""}
 
       <form id="rlog" autocomplete="off">
         <h3>Log the day</h3>

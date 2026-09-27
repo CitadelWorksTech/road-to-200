@@ -76,7 +76,7 @@ test('workout day log saves a mood emoji', async () => {
 });
 
 test('guided workout saves the session and adds push-ups', async () => {
-  const a = await openApp({ tab: 'workout' });
+  const a = await openApp({ tab: 'workout', now: '2026-09-30T18:00:00' });
   a.$('[data-wo]').click();
   for (let i = 0; i < 40 && a.$('#wo'); i++) {
     if (a.$('#wosave')) { a.$('#wosave').click(); break; }
@@ -84,8 +84,8 @@ test('guided workout saves the session and adds push-ups', async () => {
   }
   const s = a.saved();
   assert.equal(s.workouts.length, 1);
-  assert.equal(s.entries[daysAgo(0)].session, true);
-  assert.equal(s.entries[daysAgo(0)].pushups, 30);
+  assert.equal(s.entries["2026-09-30"].session, true);
+  assert.equal(s.entries["2026-09-30"].pushups, 30);
   a.close();
 });
 
@@ -222,7 +222,7 @@ test('notifications: a new milestone shows an unread badge, and opening the inbo
 });
 
 test('notifications: filter by type and tap to jump to the right tab', async () => {
-  const a = await openApp({ tab: 'workout' });
+  const a = await openApp({ tab: 'workout', now: '2026-09-30T18:00:00' });
   await wait(100);
   a.$('[data-wo]').click();
   for (let i = 0; i < 40 && a.$('#wo'); i++) {
@@ -238,5 +238,65 @@ test('notifications: filter by type and tap to jump to the right tab', async () 
   a.$('#gw [data-inote]').click();
   await wait(120);
   assert.equal(a.$('[role=tab][aria-selected="true"]').textContent.trim(), 'Workout');
+  a.close();
+});
+
+test('fight program: prep rounds on Tue/Sun, then classes, then BJJ Mondays', async () => {
+  const a = await openApp({ now: '2026-09-27T09:00:00' });
+  const p = d => a.w.dayPlan(d);
+  assert.equal(p('2026-09-29').label, 'Fight prep: 3 × 2-min rounds + walk');
+  assert.equal(p('2026-10-04').fight.rounds, 3);
+  assert.equal(p('2026-10-18').fight.mins, 3);
+  assert.match(p('2026-10-27').label, /^Fight prep test: 5 × 3-min/);
+  assert.ok(p('2026-11-01').fight.easy);
+  assert.match(p('2026-09-30').label, /^Strength/);
+  assert.equal(p('2026-11-03').cls.type, 'MT');
+  assert.equal(p('2026-11-08').label, 'Muay Thai class, 12:30 PM');
+  assert.match(p('2026-12-28').label, /^Strength/);
+  assert.equal(p('2027-01-04').cls.type, 'BJJ');
+  a.close();
+});
+
+test('guided fight prep rounds run end to end with video links and save', async () => {
+  const a = await openApp({ tab: 'workout', now: '2026-09-29T18:00:00' });
+  await wait(100);
+  assert.equal(a.doc.querySelectorAll('.focus li').length, 3);
+  assert.match(a.$('.focus .vid').href, /^https:\/\/www\.youtube\.com\/results\?search_query=muay%20thai%20stance/);
+  a.$('[data-fr]').click();
+  assert.match(a.text('#wo h2'), /March in place/);
+  assert.ok(a.$('#wo .vid'));
+  let rounds = 0;
+  for (let i = 0; i < 40 && a.$('#wo'); i++) {
+    if (a.$('#wosave')) { a.$('#wosave').click(); break; }
+    if (a.$('#wostart')) { a.$('#wostart').click(); rounds++; continue; }
+    if (a.$('#woskip')) { a.$('#woskip').click(); continue; }
+    a.$('#wodone').click();
+  }
+  assert.equal(rounds, 1); // only the first round needs a tap; the rest start after each rest
+  const wo = a.saved().workouts.find(x => x.type === 'R');
+  assert.equal(wo.rounds, 3);
+  assert.equal(wo.roundMin, 2);
+  assert.ok(a.saved().entries['2026-09-29'].session);
+  assert.match(a.text('#panel'), /Fight prep done today/);
+  a.close();
+});
+
+test('Muay Thai class days log the class', async () => {
+  const a = await openApp({ tab: 'workout', now: '2026-11-03T20:00:00' });
+  await wait(100);
+  assert.match(a.text('.today'), /Muay Thai class, 6:15 PM/);
+  a.$('[data-cls]').click();
+  const wo = a.saved().workouts.find(x => x.type === 'MT');
+  assert.equal(wo.minutes, 75);
+  assert.match(a.text('#panel'), /Muay Thai class logged today/);
+  a.close();
+});
+
+test('guided strength moves link to how-to videos', async () => {
+  const a = await openApp({ tab: 'workout', now: '2026-09-30T18:00:00' });
+  await wait(100);
+  const links = [...a.doc.querySelectorAll('.moves .vid')];
+  assert.equal(links.length, 4);
+  assert.ok(links.every(l => l.href.startsWith('https://www.youtube.com/results?search_query=')));
   a.close();
 });

@@ -1,5 +1,5 @@
 // Forgeway service worker: works offline after the first visit.
-const CACHE = "road200-v14";
+const CACHE = "road200-v15";
 const SHELL = ["./", "index.html", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png", "icons/apple-touch-icon.png", "capacitor.js", "css/app.css",
   ...["core","charts","panels","golf","steps","native","progress","workout","fight","goals","activity","settings","food","share","inbox","app"].map(n => `js/${n}.js`)];
 

@@ -130,8 +130,39 @@ function classButton(plan){
   const c=plan.cls,done=state.workouts.some(x=>x.date===todayIso()&&x.type===c.type);
   return`<div class="backup" style="margin-top:10px">${done?`<p class="foot">${esc(c.name)} logged today ✓</p>`:`<button type="button" data-cls="1">Log today's class</button>`}</div>`;
 }
+// ---------- always-visible Fight prep section ----------
+function fightLevel(date){
+  const wi=Math.max(0,Math.min(4,Math.floor((dn(date)-dn(FIGHT.prepStart))/7))),w=FIGHT.weeks[wi];
+  return{week:wi+1,rounds:w.r,mins:w.m};
+}
+function shortDate(d){return new Date(dn(d)*864e5).toLocaleDateString(undefined,{month:"short",day:"numeric",timeZone:"UTC"})}
+function fightSection(){
+  const t=todayIso(),n=dn(t)-dn(FIGHT.prepStart),cur=n>=0&&n<35?Math.floor(n/7):-1,after=n>=35;
+  const sessions=state.workouts.filter(x=>x.type==="R");
+  const toTrial=dn(FIGHT.classStart)-dn(t);
+  const status=n<0?`Starts ${fmtDate(FIGHT.prepStart)}. First rounds on ${fmtDate(iso(dn(FIGHT.prepStart)+1))}.`
+    :cur>=0?`Week ${cur+1} of 5.`:`Prep finished with ${sessions.length} round session${sessions.length===1?"":"s"} logged.`;
+  const trial=toTrial>0?` ${toTrial} day${toTrial===1?"":"s"} until trial week at Gary Grate (${fmtDate(FIGHT.classStart)}).`:"";
+  const rows=FIGHT.weeks.map((w,i)=>{
+    const a=iso(dn(FIGHT.prepStart)+i*7),b=iso(dn(a)+6),done=sessions.filter(x=>x.date>=a&&x.date<=b).length;
+    const what=w.test?"5 × 3 min test, then an easy 3 × 2":`${w.r} × ${w.m} min`;
+    return`<li class="${i===cur?"now":""}"${i===cur?' aria-current="step"':""}><span><b>Week ${i+1}</b> ${shortDate(a)}–${shortDate(b)}</span><span>${what}</span><span class="fdone">${done?`${Math.min(done,2)} of 2${done>=2?" ✓":""}`:(i<cur||after?"–":"")}</span></li>`;
+  }).join("");
+  const lvl=fightLevel(t),todayFight=!!dayPlan(t).fight;
+  const weeks=`<ol class="fweeks">${rows}</ol>`;
+  return`<div class="block fsec">
+    <h2>Fight prep</h2>
+    <p>${status}${trial}</p>
+    ${after?`<details><summary>See the 5-week plan</summary>${weeks}</details>`:weeks}
+    <h3>Round focuses</h3>
+    <ul class="focus">${FR_FOCUS.map((x,i)=>`<li><span><b>Round ${i+1}:</b> ${esc(x.n)}</span>${vidLink(x.n,"Watch")}</li>`).join("")}</ul>
+    ${todayFight?`<p class="foot">Today's round session is in the plan on the left.</p>`
+      :`<div class="backup" style="margin-top:10px"><button type="button" class="quiet" data-frany="1">Start a round session (${lvl.rounds} × ${lvl.mins} min)</button></div><p class="foot">Extra sessions are optional. Tuesday and Sunday are the main round days.</p>`}
+  </div>`;
+}
 function bindFightExtras(){
   const t=todayIso(),plan=dayPlan(t);
+  document.querySelectorAll("[data-frany]").forEach(b=>b.addEventListener("click",()=>startRounds(fightLevel(t))));
   document.querySelectorAll("[data-fr]").forEach(b=>b.addEventListener("click",()=>plan.fight&&startRounds(plan.fight)));
   document.querySelectorAll("[data-cls]").forEach(b=>b.addEventListener("click",()=>{
     if(!plan.cls)return;const e=Object.assign({},state.entries[t]||{});e.session=true;state.entries[t]=e;

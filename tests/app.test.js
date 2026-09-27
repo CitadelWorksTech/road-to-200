@@ -260,8 +260,8 @@ test('fight program: prep rounds on Tue/Sun, then classes, then BJJ Mondays', as
 test('guided fight prep rounds run end to end with video links and save', async () => {
   const a = await openApp({ tab: 'workout', now: '2026-09-29T18:00:00' });
   await wait(100);
-  assert.equal(a.doc.querySelectorAll('.focus li').length, 3);
-  assert.match(a.$('.focus .vid').href, /^https:\/\/www\.youtube\.com\/results\?search_query=muay%20thai%20stance/);
+  assert.equal(a.doc.querySelectorAll('.fcard .focus li').length, 3);
+  assert.match(a.$('.fcard .focus .vid').href, /^https:\/\/www\.youtube\.com\/results\?search_query=muay%20thai%20stance/);
   a.$('[data-fr]').click();
   assert.match(a.text('#wo h2'), /March in place/);
   assert.ok(a.$('#wo .vid'));
@@ -298,5 +298,33 @@ test('guided strength moves link to how-to videos', async () => {
   const links = [...a.doc.querySelectorAll('.moves .vid')];
   assert.equal(links.length, 4);
   assert.ok(links.every(l => l.href.startsWith('https://www.youtube.com/results?search_query=')));
+  a.close();
+});
+
+test('Fight prep section shows the 5-week plan before it starts and runs an extra session', async () => {
+  const a = await openApp({ tab: 'workout', now: '2026-09-27T10:00:00' });
+  await wait(100);
+  assert.equal(a.text('.fsec h2'), 'Fight prep');
+  assert.match(a.text('.fsec p'), /Starts .*Sep 28.*37 days until trial week/);
+  assert.equal(a.doc.querySelectorAll('.fweeks li').length, 5);
+  assert.equal(a.doc.querySelectorAll('.fsec .focus .vid').length, 5);
+  a.$('[data-frany]').click();
+  for (let i = 0; i < 40 && a.$('#wo'); i++) {
+    if (a.$('#wosave')) { a.$('#wosave').click(); break; }
+    if (a.$('#wostart')) { a.$('#wostart').click(); continue; }
+    if (a.$('#woskip')) { a.$('#woskip').click(); continue; }
+    a.$('#wodone').click();
+  }
+  assert.equal(a.saved().workouts.find(x => x.type === 'R').rounds, 3);
+  a.close();
+});
+
+test('Fight prep section highlights the current week and counts sessions', async () => {
+  const state = { workouts: [{ id: 1, date: '2026-10-06', type: 'R', minutes: 20, rounds: 4, roundMin: 2 }], savedAt: 9 };
+  const a = await openApp({ tab: 'workout', now: '2026-10-08T12:00:00', state });
+  await wait(100);
+  assert.match(a.text('.fweeks li.now'), /Week 2/);
+  assert.match(a.text('.fweeks li.now .fdone'), /1 of 2/);
+  assert.match(a.text('[data-frany]'), /4 × 2 min/);
   a.close();
 });

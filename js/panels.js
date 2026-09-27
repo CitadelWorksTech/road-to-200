@@ -98,6 +98,7 @@ function routinePanel(){
       </form>
     </section>
     <section>
+      ${fightSection()}
       <h2>Push-ups</h2>
       <div class="pushchart">${pushChart()}</div>
       ${pushStatsHtml()}
